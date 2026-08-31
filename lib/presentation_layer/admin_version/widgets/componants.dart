@@ -1,8 +1,10 @@
 // ignore_for_file: unnecessary_import, unused_import, unnecessary_null_comparison
 import 'dart:io';
 
+import 'package:buy_verse_app/presentation_layer/admin_version/widgets/responsive_helper.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:gap/gap.dart';
 
 import 'constant.dart';
 
@@ -20,43 +22,45 @@ Widget defaultTextFormField({
     filled: true,
     fillColor: Colors.grey[100],
     border: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(textFormRadius),
+      borderRadius: BorderRadius.circular(context.setWidth(textFormRadius)),
       borderSide: BorderSide.none,
     ),
     labelText: label,
-    labelStyle: TextStyle(
-      fontSize: MediaQuery.sizeOf(context).width * 0.04,
-      color: Colors.grey,
-    ),
+    labelStyle: TextStyle(fontSize: context.setSp(14), color: Colors.grey),
     hintText: hint,
-    suffixIcon: suffix != null ? Icon(suffix) : null,
+    suffixIcon: suffix != null
+        ? Icon(suffix, size: context.setWidth(20))
+        : null,
+    contentPadding: EdgeInsets.symmetric(
+      horizontal: context.setWidth(15),
+      vertical: context.setHeight(15),
+    ),
   ),
   keyboardType: type,
   controller: controller,
   onTap: onTab as void Function()?,
   validator: validate,
-  style: TextStyle(fontSize: MediaQuery.sizeOf(context).width * 0.04),
+  style: TextStyle(fontSize: context.setSp(14)),
 );
 
 // login or register button
 Widget defaultButton({
   required BuildContext context,
-  double width = double.infinity,
+  double? width,
   double? height,
   Color background = Colors.blue,
   bool isUpperCase = false,
-  double radius = 10.0,
+  double? radius,
   required Function() function,
   required String text,
 }) {
-  double screenWidth = MediaQuery.sizeOf(context).width;
-  double screenHeight = MediaQuery.sizeOf(context).height;
-
   return Container(
-    width: width,
-    height: height ?? screenHeight * 0.065,
+    width: width ?? double.infinity,
+    height: height ?? context.setHeight(55),
     decoration: BoxDecoration(
-      borderRadius: BorderRadius.circular(buttonRadius),
+      borderRadius: BorderRadius.circular(
+        context.setWidth(radius ?? buttonRadius),
+      ),
       color: background,
     ),
     child: MaterialButton(
@@ -65,7 +69,7 @@ Widget defaultButton({
         isUpperCase ? text.toUpperCase() : text,
         style: TextStyle(
           color: Colors.white,
-          fontSize: screenWidth * 0.045,
+          fontSize: context.setSp(16),
           fontWeight: FontWeight.bold,
         ),
       ),
@@ -93,23 +97,27 @@ Widget passwordTextFormField({
     filled: true,
     fillColor: Colors.grey[100],
     border: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(textFormRadius),
+      borderRadius: BorderRadius.circular(context.setWidth(textFormRadius)),
       borderSide: BorderSide.none,
     ),
     labelText: label,
-    labelStyle: TextStyle(
-      fontSize: MediaQuery.sizeOf(context).width * 0.04,
-      color: Colors.grey,
-    ),
+    labelStyle: TextStyle(fontSize: context.setSp(14), color: Colors.grey),
     hintText: hint,
     prefixIcon: prefix,
-    suffixIcon: IconButton(onPressed: suffixPressed, icon: suffix),
+    suffixIcon: IconButton(
+      onPressed: suffixPressed,
+      icon: Icon((suffix as Icon).icon, size: context.setWidth(20)),
+    ),
+    contentPadding: EdgeInsets.symmetric(
+      horizontal: context.setWidth(15),
+      vertical: context.setHeight(15),
+    ),
   ),
   keyboardType: type,
   controller: controller,
   validator: validate,
   obscureText: isPassword,
-  style: TextStyle(fontSize: MediaQuery.sizeOf(context).width * 0.04),
+  style: TextStyle(fontSize: context.setSp(14)),
 );
 
 // email FormFiled Box
@@ -129,21 +137,22 @@ Widget emailTextFormField({
     filled: true,
     fillColor: Colors.grey[100],
     border: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(textFormRadius),
+      borderRadius: BorderRadius.circular(context.setWidth(textFormRadius)),
       borderSide: BorderSide.none,
     ),
     labelText: label,
-    labelStyle: TextStyle(
-      fontSize: MediaQuery.sizeOf(context).width * 0.04,
-      color: Colors.grey,
-    ),
+    labelStyle: TextStyle(fontSize: context.setSp(14), color: Colors.grey),
     hintText: hint,
     prefixIcon: prefix,
+    contentPadding: EdgeInsets.symmetric(
+      horizontal: context.setWidth(15),
+      vertical: context.setHeight(15),
+    ),
   ),
   keyboardType: type,
   validator: validate,
   controller: controller,
-  style: TextStyle(fontSize: MediaQuery.sizeOf(context).width * 0.04),
+  style: TextStyle(fontSize: context.setSp(14)),
 );
 
 // name FormFiled Box
@@ -162,20 +171,21 @@ Widget nameTextFormField({
     filled: true,
     fillColor: Colors.grey[100],
     border: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(textFormRadius),
+      borderRadius: BorderRadius.circular(context.setWidth(textFormRadius)),
       borderSide: BorderSide.none,
     ),
     labelText: label,
-    labelStyle: TextStyle(
-      fontSize: MediaQuery.sizeOf(context).width * 0.04,
-      color: Colors.grey,
-    ),
+    labelStyle: TextStyle(fontSize: context.setSp(14), color: Colors.grey),
     hintText: hint,
+    contentPadding: EdgeInsets.symmetric(
+      horizontal: context.setWidth(15),
+      vertical: context.setHeight(15),
+    ),
   ),
   keyboardType: type,
   controller: controller,
   validator: validate,
-  style: TextStyle(fontSize: MediaQuery.sizeOf(context).width * 0.04),
+  style: TextStyle(fontSize: context.setSp(14)),
 );
 
 Widget dateTextFormField({
@@ -193,22 +203,23 @@ Widget dateTextFormField({
     filled: true,
     fillColor: Colors.grey[100],
     border: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(textFormRadius),
+      borderRadius: BorderRadius.circular(context.setWidth(textFormRadius)),
       borderSide: BorderSide.none,
     ),
     labelText: label,
-    labelStyle: TextStyle(
-      fontSize: MediaQuery.sizeOf(context).width * 0.04,
-      color: Colors.grey,
-    ),
+    labelStyle: TextStyle(fontSize: context.setSp(14), color: Colors.grey),
     hintText: hint,
-    suffix: const Icon(Icons.calendar_month_outlined),
+    suffix: Icon(Icons.calendar_month_outlined, size: context.setWidth(20)),
+    contentPadding: EdgeInsets.symmetric(
+      horizontal: context.setWidth(15),
+      vertical: context.setHeight(15),
+    ),
   ),
   keyboardType: type,
   onTap: onTap as void Function(),
   controller: controller,
   validator: validate,
-  style: TextStyle(fontSize: MediaQuery.sizeOf(context).width * 0.04),
+  style: TextStyle(fontSize: context.setSp(14)),
 );
 
 void navigateTo(BuildContext context, Widget widget) {
@@ -230,38 +241,36 @@ Widget defaultWarningMassage({
   required String text,
   required Function() function,
 }) {
-  double screenWidth = MediaQuery.sizeOf(context).width;
-
   return Container(
     color: Colors.amber,
     child: Padding(
       padding: EdgeInsets.symmetric(
-        horizontal: screenWidth * 0.04,
-        vertical: 12.0,
+        horizontal: context.setWidth(15),
+        vertical: context.setHeight(12),
       ),
       child: Row(
         children: [
           Icon(
             Icons.info_outline,
             color: Colors.black,
-            size: screenWidth * 0.06,
+            size: context.setWidth(24),
           ),
-          const SizedBox(width: 15),
+          Gap(context.setWidth(15)),
           Expanded(
             child: Text(
               warningText,
-              style: TextStyle(fontSize: screenWidth * 0.045),
+              style: TextStyle(fontSize: context.setSp(16)),
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
             ),
           ),
-          const SizedBox(width: 10),
+          Gap(context.setWidth(10)),
           TextButton(
             onPressed: function,
             child: Text(
               text,
               style: TextStyle(
-                fontSize: screenWidth * 0.045,
+                fontSize: context.setSp(16),
                 fontWeight: FontWeight.bold,
                 color: Colors.blue,
               ),
@@ -279,20 +288,18 @@ PreferredSizeWidget defaultAppBar({
   List<Widget>? actions,
   TextStyle? titleTextStyle,
 }) {
-  double screenWidth = MediaQuery.sizeOf(context).width;
-
   return AppBar(
     leading: IconButton(
       onPressed: () {
         Navigator.pop(context);
       },
-      icon: const Icon(Icons.arrow_back_ios_new),
+      icon: Icon(Icons.arrow_back_ios_new, size: context.setWidth(20)),
     ),
     title: Text(
       title,
       style:
           titleTextStyle ??
-          TextStyle(fontSize: screenWidth * 0.05, fontWeight: FontWeight.bold),
+          TextStyle(fontSize: context.setSp(18), fontWeight: FontWeight.bold),
     ),
     titleSpacing: 0.0,
     actions: actions,
