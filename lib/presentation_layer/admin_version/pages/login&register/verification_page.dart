@@ -1,13 +1,19 @@
 import 'dart:async';
 
 import 'package:buy_verse_app/presentation_layer/admin_version/widgets/componants.dart';
+import 'package:email_otp/email_otp.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:gap/gap.dart';
 import 'package:hexcolor/hexcolor.dart';
 
+import '../../../../core_layer/admin/helpers/app_localization.dart';
+import '../../../../core_layer/admin/helpers/cache_helper.dart';
+import 'login_screen.dart';
+
 class VerificationPage extends StatefulWidget {
-  const VerificationPage({super.key});
+  final String email;
+  const VerificationPage({super.key, required this.email});
 
   @override
   State<VerificationPage> createState() => _VerificationPageState();
@@ -23,17 +29,55 @@ class _VerificationPageState extends State<VerificationPage> {
   Timer? _timer;
   int _start = 598; // 09:58 in seconds
 
+  EmailOTP myauth = EmailOTP();
+  bool isResending = false;
+
   @override
   void initState() {
     super.initState();
+    // Use a slight delay to ensure context is available for translations in showToast
+    WidgetsBinding.instance.addPostFrameCallback((_) => sendOtp());
     startTimer();
-    // Add listeners to check if all fields are filled
     for (var controller in _controllers) {
       controller.addListener(() => setState(() {}));
     }
   }
 
+  void sendOtp() async {
+    var l10n = AppLocalizations.of(context);
+
+    myauth.setConfig(
+      appEmail: "support@buyverse.com",
+      appName: "BuyVerse Admin",
+      userEmail: widget.email,
+      otpLength: 6,
+      otpType: OTPType.digitsOnly,
+    );
+
+    if (await myauth.sendOTP()) {
+      if (mounted) {
+        showToast(
+          context: context,
+          text:
+              l10n?.translate('otp_sent_msg') ??
+              "OTP has been sent to your email",
+          state: ToastStates.SUCCESS,
+        );
+      }
+    } else {
+      if (mounted) {
+        showToast(
+          context: context,
+          text: l10n?.translate('otp_failed_msg') ?? "Oops, OTP send failed",
+          state: ToastStates.ERROR,
+        );
+      }
+    }
+  }
+
   void startTimer() {
+    _timer?.cancel();
+    _start = 598;
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (_start == 0) {
         setState(() {
@@ -71,11 +115,13 @@ class _VerificationPageState extends State<VerificationPage> {
 
   @override
   Widget build(BuildContext context) {
+    var l10n = AppLocalizations.of(context);
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: defaultAppBar(
         context: context,
-        title: 'Verify Email',
+        title: l10n?.translate('verify_email') ?? 'Verify Email',
         titleTextStyle: const TextStyle(
           color: Colors.black,
           fontWeight: FontWeight.bold,
@@ -89,7 +135,6 @@ class _VerificationPageState extends State<VerificationPage> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               const Gap(20),
-              // Email Icon Box
               Container(
                 width: 80,
                 height: 80,
@@ -104,9 +149,9 @@ class _VerificationPageState extends State<VerificationPage> {
                 ),
               ),
               const Gap(30),
-              const Text(
-                'Check your email',
-                style: TextStyle(
+              Text(
+                l10n?.translate('check_your_email') ?? 'Check your email',
+                style: const TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
                   color: Colors.black,
@@ -114,7 +159,7 @@ class _VerificationPageState extends State<VerificationPage> {
               ),
               const Gap(10),
               Text(
-                'We sent a 6-digit verification code to your\nregistered email address.',
+                '${l10n?.translate('otp_sent_to') ?? 'We sent a 6-digit verification code to'}\n${widget.email}',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 15,
@@ -123,20 +168,18 @@ class _VerificationPageState extends State<VerificationPage> {
                 ),
               ),
               const Gap(40),
-              // OTP Input Fields
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: List.generate(6, (index) => _buildOtpBox(index)),
               ),
               const Gap(30),
-              // Timer
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(Icons.access_time, size: 18, color: Colors.grey[600]),
                   const Gap(8),
                   Text(
-                    'Code expires in ',
+                    l10n?.translate('code_expires_in') ?? 'Code expires in ',
                     style: TextStyle(color: Colors.grey[600], fontSize: 15),
                   ),
                   Text(
@@ -149,63 +192,76 @@ class _VerificationPageState extends State<VerificationPage> {
                 ],
               ),
               const Gap(40),
-              // Verify Button
               defaultButton(
                 context: context,
-                function: () {
+                function: () async {
                   if (isOtpComplete()) {
-                    print(
-                      'Verifying OTP: ${_controllers.map((e) => e.text).join()}',
-                    );
+                    String otp = _controllers.map((e) => e.text).join();
+                    if (await myauth.verifyOTP(otp: otp)) {
+                      if (context.mounted) {
+                        showToast(
+                          context: context,
+                          text:
+                              l10n?.translate('otp_success_msg') ??
+                              "OTP Verified Successfully",
+                          state: ToastStates.SUCCESS,
+                        );
+                        // Save verification status
+                        CacheHelper.saveData(
+                          key: 'isVerified',
+                          value: true,
+                        ).then((value) {
+                          if (context.mounted) {
+                            // NEW FLOW: After verification, go back to Login Screen
+                            navigateAndFinish(context, const LoginScreen());
+                          }
+                        });
+                      }
+                    } else {
+                      if (context.mounted) {
+                        showToast(
+                          context: context,
+                          text:
+                              l10n?.translate('invalid_otp_msg') ??
+                              "Invalid OTP, please try again",
+                          state: ToastStates.ERROR,
+                        );
+                      }
+                    }
                   }
                 },
-                text: 'Verify',
+                text: l10n?.translate('verify') ?? 'Verify',
                 background: isOtpComplete()
                     ? HexColor('F5821F')
                     : const Color(0xFFFFCC99),
                 radius: 15,
               ),
               const Gap(25),
-              // Resend Code
               TextButton.icon(
                 onPressed: () {
-                  // Reset timer and clear OTP
+                  if (_start == 0) {
+                    for (var c in _controllers) {
+                      c.clear();
+                    }
+                    sendOtp();
+                    startTimer();
+                  } else {
+                    showToast(
+                      context: context,
+                      text:
+                          l10n?.translate('wait_timer_msg') ??
+                          "Please wait until the timer expires",
+                      state: ToastStates.WARNING,
+                    );
+                  }
                 },
                 icon: Icon(Icons.refresh, color: HexColor('F5821F'), size: 20),
                 label: Text(
-                  'Resend Code',
+                  l10n?.translate('resend_code') ?? 'Resend Code',
                   style: TextStyle(
                     color: HexColor('F5821F'),
                     fontWeight: FontWeight.bold,
                     fontSize: 16,
-                  ),
-                ),
-              ),
-              const Gap(40),
-              // Demo Hint
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.symmetric(vertical: 12),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFFFF7F0),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Center(
-                  child: Text.rich(
-                    TextSpan(
-                      text: 'Demo hint: enter ',
-                      style: TextStyle(color: Colors.grey[600], fontSize: 13),
-                      children: [
-                        TextSpan(
-                          text: '123456',
-                          style: TextStyle(
-                            color: HexColor('F5821F'),
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const TextSpan(text: ' to verify'),
-                      ],
-                    ),
                   ),
                 ),
               ),

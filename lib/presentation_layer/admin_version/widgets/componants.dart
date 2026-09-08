@@ -16,6 +16,8 @@ Widget defaultTextFormField({
   required String label,
   String? hint,
   Function? onTab,
+  Function(String)? onChange,
+  Function(String)? onSubmit,
   IconData? suffix,
 }) => TextFormField(
   decoration: InputDecoration(
@@ -39,6 +41,8 @@ Widget defaultTextFormField({
   keyboardType: type,
   controller: controller,
   onTap: onTab as void Function()?,
+  onChanged: onChange,
+  onFieldSubmitted: onSubmit,
   validator: validate,
   style: TextStyle(fontSize: context.setSp(14)),
 );
@@ -52,7 +56,8 @@ Widget defaultButton({
   bool isUpperCase = false,
   double? radius,
   required Function() function,
-  required String text,
+  String? text,
+  Widget? widget,
 }) {
   return Container(
     width: width ?? double.infinity,
@@ -65,14 +70,16 @@ Widget defaultButton({
     ),
     child: MaterialButton(
       onPressed: function,
-      child: Text(
-        isUpperCase ? text.toUpperCase() : text,
-        style: TextStyle(
-          color: Colors.white,
-          fontSize: context.setSp(16),
-          fontWeight: FontWeight.bold,
-        ),
-      ),
+      child:
+          widget ??
+          Text(
+            isUpperCase ? text!.toUpperCase() : text!,
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: context.setSp(16),
+              fontWeight: FontWeight.bold,
+            ),
+          ),
     ),
   );
 }
@@ -232,6 +239,65 @@ void navigateToAndFinish(BuildContext context, Widget widget) {
     MaterialPageRoute(builder: (context) => widget),
     (route) => false,
   );
+}
+
+void navigateAndFinish(BuildContext context, Widget widget) =>
+    navigateToAndFinish(context, widget);
+
+enum ToastStates { SUCCESS, ERROR, WARNING }
+
+void showToast({
+  required BuildContext context,
+  required String text,
+  required ToastStates state,
+}) {
+  // Clear any existing snackbars immediately to prevent double stacking
+  ScaffoldMessenger.of(context).clearSnackBars();
+
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      content: Row(
+        children: [
+          Icon(
+            state == ToastStates.SUCCESS
+                ? Icons.check_circle_outline
+                : state == ToastStates.ERROR
+                ? Icons.error_outline
+                : Icons.info_outline,
+            color: Colors.white,
+          ),
+          const Gap(15),
+          Expanded(
+            child: Text(
+              text,
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w600,
+                fontSize: 15,
+              ),
+            ),
+          ),
+        ],
+      ),
+      backgroundColor: chooseToastColor(state),
+      duration: const Duration(seconds: 3),
+      behavior: SnackBarBehavior.floating,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      margin: const EdgeInsets.all(20),
+      elevation: 10,
+    ),
+  );
+}
+
+Color chooseToastColor(ToastStates state) {
+  switch (state) {
+    case ToastStates.SUCCESS:
+      return Colors.green.shade600;
+    case ToastStates.ERROR:
+      return Colors.red.shade600;
+    case ToastStates.WARNING:
+      return Colors.orange.shade700;
+  }
 }
 
 // Warning massage

@@ -1,13 +1,15 @@
+import 'package:buy_verse_app/core_layer/admin/helpers/app_localization.dart';
 import 'package:buy_verse_app/presentation_layer/admin_version/pages/product_pages/products/edit_product.dart';
-import 'package:buy_verse_app/presentation_layer/admin_version/state_management/admin_models/admin_models.dart'
-    as models;
 import 'package:buy_verse_app/presentation_layer/admin_version/state_management/product/product_bloc.dart';
 import 'package:buy_verse_app/presentation_layer/admin_version/widgets/componants.dart';
 import 'package:buy_verse_app/presentation_layer/admin_version/widgets/responsive_helper.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 import 'package:hexcolor/hexcolor.dart';
+
+import '../../../../../data_layer/admin/admin_models/product.dart' as models;
 
 class ProductDetailsPage extends StatelessWidget {
   final models.Product product;
@@ -16,11 +18,13 @@ class ProductDetailsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var l10n = AppLocalizations.of(context);
+
     return Scaffold(
       backgroundColor: HexColor('F7F8FA'),
       appBar: defaultAppBar(
         context: context,
-        title: 'Product Details',
+        title: l10n?.translate('product_details') ?? 'Product Details',
         actions: [
           IconButton(
             onPressed: () =>
@@ -44,14 +48,22 @@ class ProductDetailsPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(
+            CachedNetworkImage(
+              imageUrl: product.image,
               width: double.infinity,
               height: context.setHeight(300),
-              decoration: BoxDecoration(
-                image: DecorationImage(
-                  image: NetworkImage(product.image),
-                  fit: BoxFit.cover,
-                ),
+              fit: BoxFit.cover,
+              placeholder: (context, url) => Container(
+                width: double.infinity,
+                height: context.setHeight(300),
+                color: Colors.grey[200],
+                child: const Center(child: CircularProgressIndicator()),
+              ),
+              errorWidget: (context, url, error) => Container(
+                width: double.infinity,
+                height: context.setHeight(300),
+                color: Colors.grey[200],
+                child: const Icon(Icons.image_not_supported, size: 50),
               ),
             ),
             Padding(
@@ -68,10 +80,7 @@ class ProductDetailsPage extends StatelessWidget {
                   ),
                   Text(
                     product.category,
-                    style: TextStyle(
-                      fontSize: context.setSp(16),
-                      color: Colors.grey,
-                    ),
+                    style: const TextStyle(fontSize: 16, color: Colors.grey),
                   ),
                   Gap(context.setHeight(20)),
                   Row(
@@ -79,26 +88,28 @@ class ProductDetailsPage extends StatelessWidget {
                     children: [
                       _buildStatItem(
                         context,
-                        'Price',
-                        product.price,
+                        l10n?.translate('price') ?? 'Price',
+                        '${product.price} EGP',
                         HexColor('F5821F'),
                       ),
                       _buildStatItem(
                         context,
-                        'In Stock',
+                        l10n?.translate('quantity') ?? 'In Stock',
                         product.quantity,
                         Colors.black,
                       ),
                       _buildStatusBadge(
                         context,
-                        product.isVisible ? 'Visible' : 'Hidden',
+                        product.isVisible
+                            ? l10n?.translate('visible') ?? 'Visible'
+                            : l10n?.translate('hidden') ?? 'Hidden',
                         product.isVisible ? Colors.green : Colors.grey,
                       ),
                     ],
                   ),
                   Gap(context.setHeight(30)),
                   Text(
-                    'DESCRIPTION',
+                    l10n?.translate('description') ?? 'DESCRIPTION',
                     style: TextStyle(
                       fontSize: context.setSp(14),
                       fontWeight: FontWeight.bold,
@@ -112,7 +123,7 @@ class ProductDetailsPage extends StatelessWidget {
                   ),
                   Gap(context.setHeight(30)),
                   Text(
-                    'DETAILS',
+                    l10n?.translate('details') ?? 'DETAILS',
                     style: TextStyle(
                       fontSize: context.setSp(14),
                       fontWeight: FontWeight.bold,
@@ -120,14 +131,22 @@ class ProductDetailsPage extends StatelessWidget {
                     ),
                   ),
                   Gap(context.setHeight(10)),
-                  _buildDetailRow(context, 'Category', product.category),
-                  _buildDetailRow(context, 'Added Date', 'Oct 24, 2023'),
+                  _buildDetailRow(
+                    context,
+                    l10n?.translate('category') ?? 'Category',
+                    product.category,
+                  ),
+                  _buildDetailRow(
+                    context,
+                    l10n?.translate('added_date') ?? 'Added Date',
+                    'Oct 24, 2023',
+                  ),
                   Gap(context.setHeight(40)),
                   defaultButton(
                     context: context,
                     function: () =>
                         navigateTo(context, EditProductPage(product: product)),
-                    text: 'Edit Product',
+                    text: l10n?.translate('edit_product') ?? 'Edit Product',
                     background: HexColor('F5821F'),
                   ),
                 ],

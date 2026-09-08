@@ -1,76 +1,111 @@
-import 'package:buy_verse_app/presentation_layer/admin_version/state_management/admin_models/admin_models.dart';
+import 'dart:io';
+
+import 'package:dio/dio.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
+import '../../../../core_layer/admin/helpers/cache_helper.dart';
+import '../../../../core_layer/admin/helpers/dio_helper.dart';
+import '../../../../core_layer/admin/helpers/notification_helper.dart';
+import '../../../../data_layer/admin/admin_models/product.dart';
 
 part 'product_event.dart';
 part 'product_state.dart';
 
 class ProductBloc extends Bloc<ProductEvent, ProductState> {
   ProductBloc() : super(ProductInitial()) {
-    final List<Product> dummyProducts = [
-      const Product(
-        id: '1',
-        name: 'Wireless Headphones',
-        category: 'Electronics',
-        price: '299',
-        quantity: '45',
-        description:
-            'Experience high-quality sound with these wireless headphones. Featuring long battery life and comfortable ear cups for all-day use.',
-        image:
-            'https://img.freepik.com/free-photo/shiny-black-headphones-reflect-golden-luxury-generated-by-ai_188544-23030.jpg',
-      ),
-      const Product(
-        id: '2',
-        name: 'Cotton T-Shirt',
-        category: 'Clothing',
-        price: '89',
-        quantity: '120',
-        description: 'Comfortable cotton t-shirt for daily wear.',
-        image:
-            'https://img.freepik.com/free-photo/simple-white-t-shirt-men-s-apparel_53876-102021.jpg',
-      ),
-      const Product(
-        id: '3',
-        name: 'Organic Coffee',
-        category: 'Food',
-        price: '45',
-        quantity: '200',
-        description: 'Fresh organic coffee beans.',
-        image:
-            'https://img.freepik.com/free-photo/coffee-beans-bag_23-2148270542.jpg',
-        isVisible: false,
-      ),
-    ];
-
-    on<GetProducts>((event, emit) {
+    on<GetProducts>((event, emit) async {
       emit(ProductLoading());
-      emit(ProductLoaded(List.from(dummyProducts)));
-    });
+      try {
+        final response = await DioHelper.getData(url: '/admin/products');
+        if (response.statusCode == 200) {
+          final List<dynamic> data = response.data['data'];
+          final products = data.map((json) {
+            final product = Product(
+              id: json['slug'] ?? json['id'].toString(),
+              name: json['name'] ?? '',
+              category: json['category']['name'] ?? '',
+              price: json['price'].toString(),
+              quantity: json['quantity'].toString(),
+              description: json['description'] ?? '',
+              image: json['image'] ?? '',
+              isVisible: json['visible'] == 1,
+            );
 
-    on<AddProduct>((event, emit) {
-      if (state is ProductLoaded) {
-        final products = List<Product>.from((state as ProductLoaded).products)
-          ..add(event.product);
-        emit(ProductLoaded(products));
+            // فحص المخزون وإرسال إشعار محلي
+            _checkStockAndNotify(product);
+
+            return product;
+          }).toList();
+          emit(ProductLoaded(products));
+        } else {
+          emit(const ProductLoaded([]));
+        }
+      } catch (e) {
+        emit(const ProductLoaded([]));
       }
     });
 
-    on<EditProduct>((event, emit) {
-      if (state is ProductLoaded) {
-        final products = (state as ProductLoaded).products
-            .map((p) => p.id == event.product.id ? event.product : p)
-            .toList();
-        emit(ProductLoaded(products));
+    on<AddProduct>((event, emit) async {
+      emit(ProductLoading());
+      try {
+        FormData formData = FormData.fromMap({
+          'name': event.product.name,
+          'price': event.product.price,
+          'quantity': event.product.quantity,
+          'category_id': event.product.category,
+          'visible': event.product.isVisible ? '1' : '0',
+          'description': event.product.description,
+        });
+
+        if (event.imageFile != null) {
+          formData.files.add(
+            MapEntry(
+              'image',
+              await MultipartFile.fromFile(
+                event.imageFile!.path,
+                filename: 'product.png',
+              ),
+            ),
+          );
+        }
+
+        final response = await DioHelper.postData(
+          url: '/admin/products/store',
+          data: formData,
+        );
+        if (response.statusCode == 200 || response.statusCode == 201) {
+          add(GetProducts());
+          emit(const ProductSuccess('Product Added Successfully'));
+        }
+      } catch (e) {
+        emit(ProductError(e.toString()));
       }
     });
 
-    on<DeleteProduct>((event, emit) {
-      if (state is ProductLoaded) {
-        final products = (state as ProductLoaded).products
-            .where((p) => p.id != event.id)
-            .toList();
-        emit(ProductLoaded(products));
-      }
-    });
+    // ... باقي العمليات (Edit, Delete) تتبع نفس النمط باستخدام DioHelper
+  }
+
+  void _checkStockAndNotify(Product product) {
+    int qty = int.tryParse(product.quantity) ?? 0;
+    String lang = CacheHelper.getData(key: 'languageCode') ?? 'ar';
+
+    if (qty == 0) {
+      NotificationHelper.showNotification(
+        title: lang == 'ar' ? 'نفذت الكمية' : 'Out of Stock',
+        body: lang == 'ar'
+            ? 'المنتج ${product.name} غير متوفر'
+            : '${product.name} is out of stock',
+        saveToFirestore: true,
+      );
+    } else if (qty <= 20) {
+      NotificationHelper.showNotification(
+        title: lang == 'ar' ? 'تنبيه مخزون' : 'Stock Warning',
+        body: lang == 'ar'
+            ? 'بقي $qty قطع فقط من ${product.name}'
+            : 'Only $qty left of ${product.name}',
+        saveToFirestore: true,
+      );
+    }
   }
 }

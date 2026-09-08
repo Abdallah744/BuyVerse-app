@@ -1,8 +1,21 @@
-import 'package:buy_verse_app/presentation_layer/admin_version/pages/login&register/verification_page.dart';
+// ignore_for_file: unused_element
+
+import 'dart:io';
+
+import 'package:buy_verse_app/presentation_layer/admin_version/pages/login&register/login_screen.dart';
+import 'package:buy_verse_app/presentation_layer/admin_version/state_management/auth/login/login_bloc.dart';
+import 'package:buy_verse_app/presentation_layer/admin_version/state_management/auth/login/login_event.dart';
+import 'package:buy_verse_app/presentation_layer/admin_version/state_management/auth/login/login_state.dart';
 import 'package:buy_verse_app/presentation_layer/admin_version/widgets/componants.dart';
+import 'package:buy_verse_app/presentation_layer/admin_version/widgets/map_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 import 'package:hexcolor/hexcolor.dart';
+import 'package:image_picker/image_picker.dart';
+
+import '../../../../core_layer/admin/helpers/app_localization.dart';
+import '../../../../data_layer/admin/admin_models/profile.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -28,6 +41,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
   // Controllers for Step 2
   var businessNameController = TextEditingController();
   var businessAddressController = TextEditingController();
+  var storeLocationController = TextEditingController();
+
+  // File Paths
+  String? profileImagePath;
+  String? commercialRegisterPath;
+  String? taxCardPath;
+  final ImagePicker _picker = ImagePicker();
 
   // Controllers for Step 3
   var passwordController = TextEditingController();
@@ -38,7 +58,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   void initState() {
     super.initState();
-    // Add listeners to rebuild when text changes for button color update
     nameController.addListener(() => setState(() {}));
     emailController.addListener(() => setState(() {}));
     phoneController.addListener(() => setState(() {}));
@@ -46,6 +65,20 @@ class _RegisterScreenState extends State<RegisterScreen> {
     businessNameController.addListener(() => setState(() {}));
     passwordController.addListener(() => setState(() {}));
     confirmPasswordController.addListener(() => setState(() {}));
+  }
+
+  Future<void> _pickImage(String type) async {
+    final XFile? image = await _picker.pickImage(
+      source: ImageSource.gallery,
+      imageQuality: 25, // Compress image to reduce size below 5MB
+    );
+    if (image != null) {
+      setState(() {
+        if (type == 'profile') profileImagePath = image.path;
+        if (type == 'commercial') commercialRegisterPath = image.path;
+        if (type == 'tax') taxCardPath = image.path;
+      });
+    }
   }
 
   @override
@@ -56,6 +89,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     nationalIdController.dispose();
     businessNameController.dispose();
     businessAddressController.dispose();
+    storeLocationController.dispose();
     passwordController.dispose();
     confirmPasswordController.dispose();
     super.dispose();
@@ -113,47 +147,72 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: defaultAppBar(
-        context: context,
-        title: 'Create Account',
-        titleTextStyle: const TextStyle(
-          color: Colors.black,
-          fontWeight: FontWeight.bold,
-          fontSize: 18,
-        ),
-      ),
-      body: Column(
-        children: [
-          const Gap(10),
-          // Progress Bar
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 25.0),
-            child: Row(
-              children: [
-                _buildProgressSegment(1),
-                const Gap(8),
-                _buildProgressSegment(2),
-                const Gap(8),
-                _buildProgressSegment(3),
-              ],
+    var l10n = AppLocalizations.of(context);
+
+    return BlocConsumer<AuthBloc, AuthState>(
+      listener: (context, state) {
+        if (state is Authenticated) {
+          showToast(
+            context: context,
+            text: l10n?.translate('success') ?? 'Account Created Successfully',
+            state: ToastStates.SUCCESS,
+          );
+          // NEW FLOW: After registration, go to Login Screen
+          navigateAndFinish(context, const LoginScreen());
+        }
+        if (state is AuthError) {
+          showToast(
+            context: context,
+            text: state.message,
+            state: ToastStates.ERROR,
+          );
+        }
+      },
+      builder: (context, state) {
+        return Scaffold(
+          backgroundColor: Colors.white,
+          appBar: defaultAppBar(
+            context: context,
+            title: l10n?.translate('register') ?? 'Create Account',
+            titleTextStyle: const TextStyle(
+              color: Colors.black,
+              fontWeight: FontWeight.bold,
+              fontSize: 18,
             ),
           ),
-          const Gap(20),
-          Expanded(
-            child: PageView(
-              controller: _pageController,
-              physics: const NeverScrollableScrollPhysics(),
-              children: [
-                _buildPersonalInfoStep(),
-                _buildBusinessInfoStep(),
-                _buildSecurityStep(),
-              ],
-            ),
+          body: Column(
+            children: [
+              if (state is AuthLoading) const LinearProgressIndicator(),
+              const Gap(10),
+              // Progress Bar
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 25.0),
+                child: Row(
+                  children: [
+                    _buildProgressSegment(1),
+                    const Gap(8),
+                    _buildProgressSegment(2),
+                    const Gap(8),
+                    _buildProgressSegment(3),
+                  ],
+                ),
+              ),
+              const Gap(20),
+              Expanded(
+                child: PageView(
+                  controller: _pageController,
+                  physics: const NeverScrollableScrollPhysics(),
+                  children: [
+                    _buildPersonalInfoStep(),
+                    _buildBusinessInfoStep(),
+                    _buildSecurityStep(state),
+                  ],
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 
@@ -172,6 +231,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   // --- Step 1: Personal Information ---
   Widget _buildPersonalInfoStep() {
+    var l10n = AppLocalizations.of(context);
+
     return SingleChildScrollView(
       child: Padding(
         padding: const EdgeInsets.all(25.0),
@@ -181,59 +242,106 @@ class _RegisterScreenState extends State<RegisterScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Step 1 of 3 — Personal',
+                '${l10n?.translate('step') ?? 'Step'} $currentStep ${l10n?.translate('of') ?? 'of'} 3',
                 style: TextStyle(color: Colors.grey[500], fontSize: 13),
               ),
               const Gap(5),
-              const Text(
-                'Personal Information',
-                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+              Text(
+                l10n?.translate('personal_information') ??
+                    'Personal Information',
+                style: const TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               const Gap(30),
-              _buildFieldLabel('Full Name'),
+              _buildFieldLabel(l10n?.translate('full_name') ?? 'Full Name'),
               nameTextFormField(
                 context: context,
                 controller: nameController,
                 type: TextInputType.name,
                 hint: 'Ahmed Khalil',
                 label: '',
-                validate: (value) => value!.isEmpty ? 'Enter your name' : null,
+                validate: (value) {
+                  if (value!.isEmpty) {
+                    return l10n?.translate('name_required') ??
+                        'Enter your name';
+                  }
+                  if (RegExp(r'[0-9]').hasMatch(value)) {
+                    return l10n?.translate('name_no_numbers') ??
+                        'Name should not contain numbers';
+                  }
+                  return null;
+                },
               ),
               const Gap(20),
-              _buildFieldLabel('Email'),
+              _buildFieldLabel(l10n?.translate('email') ?? 'Email'),
               emailTextFormField(
                 context: context,
                 controller: emailController,
                 type: TextInputType.emailAddress,
                 hint: 'ahmed@business.com',
                 label: '',
-                validate: (value) => value!.isEmpty ? 'Enter email' : null,
+                validate: (value) {
+                  if (value!.isEmpty) {
+                    return l10n?.translate('email_required') ?? 'Enter email';
+                  }
+                  if (!RegExp(
+                    r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+",
+                  ).hasMatch(value)) {
+                    return l10n?.translate('invalid_email') ??
+                        'Enter a valid email address';
+                  }
+                  return null;
+                },
               ),
               const Gap(20),
-              _buildFieldLabel('Phone Number'),
+              _buildFieldLabel(l10n?.translate('phone') ?? 'Phone Number'),
               defaultTextFormField(
                 context: context,
                 controller: phoneController,
                 type: TextInputType.phone,
                 hint: '+20 100 000 0000',
                 label: '',
-                validate: (value) => value!.isEmpty ? 'Enter phone' : null,
+                validate: (value) {
+                  if (value!.isEmpty) {
+                    return l10n?.translate('phone_required') ?? 'Enter phone';
+                  }
+                  if (!RegExp(r'^\+?[0-9]+$').hasMatch(value)) {
+                    return l10n?.translate('phone_invalid_format') ??
+                        'Enter a valid phone number';
+                  }
+                  return null;
+                },
               ),
               const Gap(20),
-              _buildFieldLabel('National ID'),
+              _buildFieldLabel(l10n?.translate('national_id') ?? 'National ID'),
               defaultTextFormField(
                 context: context,
                 controller: nationalIdController,
                 type: TextInputType.number,
                 hint: '14-digit national ID',
                 label: '',
-                validate: (value) => value!.isEmpty ? 'Enter ID' : null,
+                validate: (value) {
+                  if (value!.isEmpty) {
+                    return l10n?.translate('id_required') ?? 'Enter ID';
+                  }
+                  if (value.length < 14) {
+                    return l10n?.translate('id_too_short') ??
+                        'ID must be at least 14 digits';
+                  }
+                  if (!RegExp(r'^[0-9]+$').hasMatch(value)) {
+                    return l10n?.translate('id_digits_only') ??
+                        'ID must be digits only';
+                  }
+                  return null;
+                },
               ),
               const Gap(40),
               defaultButton(
                 context: context,
                 function: nextStep,
-                text: 'Continue',
+                text: l10n?.translate('confirm') ?? 'Continue',
                 background: isStep1Complete()
                     ? HexColor('F5821F')
                     : const Color(0xFFFFCC99),
@@ -248,6 +356,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   // --- Step 2: Business Information ---
   Widget _buildBusinessInfoStep() {
+    var l10n = AppLocalizations.of(context);
+    String optionalStr = '(${l10n?.translate('optional') ?? 'Optional'})';
+
     return SingleChildScrollView(
       child: Padding(
         padding: const EdgeInsets.all(25.0),
@@ -256,62 +367,114 @@ class _RegisterScreenState extends State<RegisterScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                'Step 2 of 3 — Business',
-                style: TextStyle(color: Colors.grey[500], fontSize: 13),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    '${l10n?.translate('step') ?? 'Step'} $currentStep ${l10n?.translate('of') ?? 'of'} 3',
+                    style: TextStyle(color: Colors.grey[500], fontSize: 13),
+                  ),
+                  TextButton(
+                    onPressed: previousStep,
+                    child: Text(
+                      l10n?.translate('back') ?? 'Back',
+                      style: TextStyle(color: HexColor('F5821F')),
+                    ),
+                  ),
+                ],
               ),
               const Gap(5),
-              const Text(
-                'Business Information',
-                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+              Text(
+                l10n?.translate('business_information') ??
+                    'Business Information',
+                style: const TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               const Gap(30),
-              _buildFieldLabel('Business Name'),
+              _buildFieldLabel(
+                l10n?.translate('business_name') ?? 'Business Name',
+              ),
               defaultTextFormField(
                 context: context,
                 controller: businessNameController,
                 type: TextInputType.text,
                 hint: 'My Digital Store',
                 label: '',
-                validate: (value) =>
-                    value!.isEmpty ? 'Enter business name' : null,
+                validate: (value) => value!.isEmpty
+                    ? l10n?.translate('business_name_required') ??
+                          'Enter business name'
+                    : null,
               ),
               const Gap(20),
-              _buildFieldLabel('Business Address (Optional)'),
+              _buildFieldLabel(
+                '${l10n?.translate('business_address') ?? 'Business Address'} $optionalStr',
+              ),
               defaultTextFormField(
                 context: context,
                 controller: businessAddressController,
                 type: TextInputType.text,
-                hint: 'Optional',
+                hint: l10n?.translate('optional') ?? 'Optional',
                 label: '',
                 validate: (value) => null,
               ),
               const Gap(20),
-              _buildFieldLabel('Store Location (Optional)'),
-              _buildSelectableField(
-                hint: 'Tap to set store location',
-                icon: Icons.location_on_outlined,
-                onTap: () {},
+              _buildFieldLabel(
+                l10n?.translate('store_location') ?? 'Store Location',
+              ),
+              defaultTextFormField(
+                context: context,
+                controller: storeLocationController,
+                type: TextInputType.text,
+                hint: 'Cairo, Egypt',
+                label: '',
+                onTab: () async {
+                  final result = await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const MapPickerScreen(),
+                    ),
+                  );
+                  if (result != null) {
+                    setState(() {
+                      storeLocationController.text = result;
+                    });
+                  }
+                },
+                validate: (value) => value!.isEmpty
+                    ? l10n?.translate('location_required') ??
+                          'Enter store location'
+                    : null,
               ),
               const Gap(20),
-              _buildFieldLabel('Commercial Register (Optional)'),
+              _buildFieldLabel(
+                '${l10n?.translate('commercial_register') ?? 'Commercial Register'} $optionalStr',
+              ),
               _buildUploadField(
-                text: 'Upload Commercial Register',
+                text: commercialRegisterPath == null
+                    ? l10n?.translate('pick_file') ??
+                          'Upload Commercial Register'
+                    : l10n?.translate('uploaded') ?? 'File Selected',
                 icon: Icons.file_upload_outlined,
-                onTap: () {},
+                onTap: () => _pickImage('commercial'),
               ),
               const Gap(20),
-              _buildFieldLabel('Tax Card (Optional)'),
+              _buildFieldLabel(
+                '${l10n?.translate('tax_card') ?? 'Tax Card'} $optionalStr',
+              ),
               _buildUploadField(
-                text: 'Upload Tax Card',
+                text: taxCardPath == null
+                    ? l10n?.translate('pick_file') ?? 'Upload Tax Card'
+                    : l10n?.translate('uploaded') ?? 'File Selected',
                 icon: Icons.file_upload_outlined,
-                onTap: () {},
+                onTap: () => _pickImage('tax'),
               ),
               const Gap(40),
               defaultButton(
                 context: context,
                 function: nextStep,
-                text: 'Continue',
+                text: l10n?.translate('confirm') ?? 'Continue',
                 background: isStep2Complete()
                     ? HexColor('F5821F')
                     : const Color(0xFFFFCC99),
@@ -325,7 +488,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
 
   // --- Step 3: Security ---
-  Widget _buildSecurityStep() {
+  Widget _buildSecurityStep(AuthState state) {
+    var l10n = AppLocalizations.of(context);
+    String optionalStr = '(${l10n?.translate('optional') ?? 'Optional'})';
+
     return SingleChildScrollView(
       child: Padding(
         padding: const EdgeInsets.all(25.0),
@@ -334,17 +500,34 @@ class _RegisterScreenState extends State<RegisterScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                'Step 3 of 3 — Security',
-                style: TextStyle(color: Colors.grey[500], fontSize: 13),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    '${l10n?.translate('step') ?? 'Step'} $currentStep ${l10n?.translate('of') ?? 'of'} 3',
+                    style: TextStyle(color: Colors.grey[500], fontSize: 13),
+                  ),
+                  TextButton(
+                    onPressed: previousStep,
+                    child: Text(
+                      l10n?.translate('back') ?? 'Back',
+                      style: TextStyle(color: HexColor('F5821F')),
+                    ),
+                  ),
+                ],
               ),
               const Gap(5),
-              const Text(
-                'Security',
-                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+              Text(
+                l10n?.translate('security') ?? 'Security',
+                style: const TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               const Gap(30),
-              _buildFieldLabel('Profile Picture (Optional)'),
+              _buildFieldLabel(
+                '${l10n?.translate('profile_image') ?? 'Profile Picture'} $optionalStr',
+              ),
               Row(
                 children: [
                   Container(
@@ -353,22 +536,30 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     decoration: BoxDecoration(
                       color: Colors.grey[100],
                       shape: BoxShape.circle,
+                      image: profileImagePath != null
+                          ? DecorationImage(
+                              image: FileImage(File(profileImagePath!)),
+                              fit: BoxFit.cover,
+                            )
+                          : null,
                     ),
-                    child: const Icon(
-                      Icons.camera_alt_outlined,
-                      color: Colors.grey,
-                    ),
+                    child: profileImagePath == null
+                        ? const Icon(
+                            Icons.camera_alt_outlined,
+                            color: Colors.grey,
+                          )
+                        : null,
                   ),
                   const Gap(15),
                   TextButton.icon(
-                    onPressed: () {},
+                    onPressed: () => _pickImage('profile'),
                     icon: Icon(
                       Icons.file_upload_outlined,
                       color: HexColor('F5821F'),
                       size: 18,
                     ),
                     label: Text(
-                      'Upload photo',
+                      l10n?.translate('pick_image') ?? 'Upload photo',
                       style: TextStyle(
                         color: HexColor('F5821F'),
                         fontWeight: FontWeight.bold,
@@ -378,32 +569,51 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 ],
               ),
               const Gap(30),
-              _buildFieldLabel('Password'),
+              _buildFieldLabel(l10n?.translate('password') ?? 'Password'),
               passwordTextFormField(
                 context: context,
                 controller: passwordController,
                 type: TextInputType.visiblePassword,
-                hint: 'Create a strong password',
+                hint: l10n?.translate('password') ?? 'Create a strong password',
                 label: '',
                 isPassword: isPassword,
                 suffixPressed: () => setState(() => isPassword = !isPassword),
-                validate: (value) => value!.isEmpty ? 'Enter password' : null,
+                validate: (value) {
+                  if (value!.isEmpty) {
+                    return l10n?.translate('password_required') ??
+                        'Enter password';
+                  }
+                  if (value.length < 8) {
+                    return l10n?.translate('password_too_short') ??
+                        'Password must be at least 8 characters';
+                  }
+                  return null;
+                },
               ),
               const Gap(20),
-              _buildFieldLabel('Confirm Password'),
+              _buildFieldLabel(
+                l10n?.translate('confirm_password') ?? 'Confirm Password',
+              ),
               passwordTextFormField(
                 context: context,
                 controller: confirmPasswordController,
                 type: TextInputType.visiblePassword,
-                hint: 'Repeat your password',
+                hint:
+                    l10n?.translate('confirm_password') ??
+                    'Repeat your password',
                 label: '',
                 isPassword: isConfirmPassword,
                 suffixPressed: () =>
                     setState(() => isConfirmPassword = !isConfirmPassword),
                 validate: (value) {
-                  if (value!.isEmpty) return 'Confirm your password';
-                  if (value != passwordController.text)
-                    return 'Passwords do not match';
+                  if (value!.isEmpty) {
+                    return l10n?.translate('password_required') ??
+                        'Confirm your password';
+                  }
+                  if (value != passwordController.text) {
+                    return l10n?.translate('passwords_not_match') ??
+                        'Passwords do not match';
+                  }
                   return null;
                 },
               ),
@@ -412,11 +622,28 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 context: context,
                 function: () {
                   if (formKey3.currentState!.validate()) {
-                    navigateTo(context, VerificationPage());
+                    context.read<AuthBloc>().add(
+                      RegisterRequested(
+                        profile: UserProfile(
+                          fullName: nameController.text,
+                          email: emailController.text,
+                          phone: phoneController.text,
+                          nationalId: nationalIdController.text,
+                          businessName: businessNameController.text,
+                          businessAddress: businessAddressController.text,
+                          storeLocation: storeLocationController.text,
+                        ),
+                        password: passwordController.text,
+                        profileImagePath: profileImagePath,
+                        commercialRegisterPath: commercialRegisterPath,
+                        taxCardPath: taxCardPath,
+                      ),
+                    );
+                    navigateAndFinish(context, LoginScreen());
                   }
                 },
-                text: 'Create Account',
-                background: isStep3Complete()
+                text: l10n?.translate('register') ?? 'Create Account',
+                background: isStep3Complete() && state is! AuthLoading
                     ? HexColor('F5821F')
                     : const Color(0xFFFFCC99),
                 radius: 15,
@@ -427,8 +654,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
       ),
     );
   }
-
-  // --- Helper Widgets ---
 
   Widget _buildFieldLabel(String label) {
     return Padding(

@@ -17,3 +17,11 @@ class UpdateOrderStatus extends OrderEvent {
   @override
   List<Object> get props => [orderId, newStatus];
 }
+
+class UpdateOrderList extends OrderEvent {
+  final List<Order> orders;
+  const UpdateOrderList(this.orders);
+
+  @override
+  List<Object> get props => [orders];
+}

@@ -26,3 +26,11 @@ class CategoryError extends CategoryState {
   @override
   List<Object> get props => [message];
 }
+
+class CategorySuccess extends CategoryState {
+  final String message;
+  const CategorySuccess(this.message);
+
+  @override
+  List<Object> get props => [message];
+}

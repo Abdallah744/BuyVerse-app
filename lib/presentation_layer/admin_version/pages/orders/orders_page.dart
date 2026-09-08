@@ -1,84 +1,102 @@
+// ignore_for_file: unused_local_variable
+
 import 'package:buy_verse_app/presentation_layer/admin_version/pages/orders/order_details.dart';
+import 'package:buy_verse_app/presentation_layer/admin_version/state_management/order/order_bloc.dart';
 import 'package:buy_verse_app/presentation_layer/admin_version/widgets/componants.dart';
 import 'package:buy_verse_app/presentation_layer/admin_version/widgets/responsive_helper.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 import 'package:hexcolor/hexcolor.dart';
 
+import '../../../../core_layer/admin/helpers/app_localization.dart';
+import '../../../../data_layer/admin/admin_models/order.dart';
+
 class OrdersPage extends StatelessWidget {
-  const OrdersPage({super.key});
+  final bool showPendingOnly;
+
+  const OrdersPage({super.key, this.showPendingOnly = false});
 
   @override
   Widget build(BuildContext context) {
+    var l10n = AppLocalizations.of(context);
+
     return Scaffold(
       backgroundColor: HexColor('F7F8FA'),
+      appBar: showPendingOnly
+          ? defaultAppBar(
+              context: context,
+              title: l10n?.translate('pending_orders') ?? 'Pending Orders',
+            )
+          : null,
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: EdgeInsets.all(context.setWidth(20.0)),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Orders',
-                  style: TextStyle(
-                    fontSize: context.setSp(28),
-                    fontWeight: FontWeight.bold,
+        child: BlocBuilder<OrderBloc, OrderState>(
+          builder: (context, state) {
+            if (state is OrderLoading) {
+              return const Center(child: CircularProgressIndicator());
+            }
+
+            if (state is OrderLoaded) {
+              var orders = state.orders;
+              if (showPendingOnly) {
+                orders = orders
+                    .where((order) => order.status == 'Pending')
+                    .toList();
+              }
+
+              if (orders.isEmpty) {
+                return Center(
+                  child: Text(
+                    l10n?.translate('no_orders') ?? 'No orders found',
+                  ),
+                );
+              }
+
+              return SingleChildScrollView(
+                child: Padding(
+                  padding: EdgeInsets.all(context.setWidth(20.0)),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if (!showPendingOnly)
+                        Text(
+                          l10n?.translate('orders') ?? 'Orders',
+                          style: TextStyle(
+                            fontSize: context.setSp(28),
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      if (!showPendingOnly) Gap(context.setHeight(20)),
+                      ListView.separated(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemBuilder: (context, index) =>
+                            _buildOrderItem(context, order: orders[index]),
+                        separatorBuilder: (context, index) =>
+                            Gap(context.setHeight(15)),
+                        itemCount: orders.length,
+                      ),
+                    ],
                   ),
                 ),
-                Gap(context.setHeight(20)),
-                _buildOrderItem(
-                  context,
-                  orderId: '#567ITDSD',
-                  customer: 'Sarah Mitchell',
-                  date: 'Jan 15, 2024 - 02:32 PM',
-                  items: '2 Items',
-                  payment: 'Card',
-                  price: '687',
-                  status: 'Pending',
-                ),
-                Gap(context.setHeight(15)),
-                _buildOrderItem(
-                  context,
-                  orderId: '#891KLFPR',
-                  customer: 'Omar Hassan',
-                  date: 'Jan 14, 2024 - 09:15 AM',
-                  items: '1 Item',
-                  payment: 'Cash',
-                  price: '599',
-                  status: 'Pending',
-                ),
-                Gap(context.setHeight(15)),
-                _buildOrderItem(
-                  context,
-                  orderId: '#992PLXRT',
-                  customer: 'John Doe',
-                  date: 'Jan 13, 2024 - 11:45 AM',
-                  items: '3 Items',
-                  payment: 'Card',
-                  price: '1,250',
-                  status: 'Delivered',
-                  statusColor: Colors.green,
-                ),
-              ],
-            ),
-          ),
+              );
+            }
+
+            return Center(
+              child: Text(l10n?.translate('error') ?? 'Something went wrong'),
+            );
+          },
         ),
       ),
     );
   }
 
-  Widget _buildOrderItem(
-    BuildContext context, {
-    required String orderId,
-    required String customer,
-    required String date,
-    required String items,
-    required String payment,
-    required String price,
-    required String status,
-    Color statusColor = Colors.orange,
-  }) {
+  Widget _buildOrderItem(BuildContext context, {required Order order}) {
+    var l10n = AppLocalizations.of(context);
+    Color statusColor = order.status == 'Delivered'
+        ? Colors.green
+        : Colors.orange;
+
     return InkWell(
       onTap: () {
         navigateTo(context, const OrderDetailsPage());
@@ -103,7 +121,7 @@ class OrdersPage extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  orderId,
+                  '#${order.id.length > 8 ? order.id.substring(0, 8).toUpperCase() : order.id.toUpperCase()}',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: context.setSp(16),
@@ -130,7 +148,7 @@ class OrdersPage extends StatelessWidget {
                       ),
                       Gap(context.setWidth(6)),
                       Text(
-                        status,
+                        order.status,
                         style: TextStyle(
                           color: statusColor,
                           fontWeight: FontWeight.bold,
@@ -144,7 +162,7 @@ class OrdersPage extends StatelessWidget {
             ),
             Gap(context.setHeight(5)),
             Text(
-              customer,
+              order.customer,
               style: TextStyle(
                 color: Colors.grey[600],
                 fontSize: context.setSp(14),
@@ -165,7 +183,7 @@ class OrdersPage extends StatelessWidget {
                     ),
                     Gap(context.setWidth(5)),
                     Text(
-                      date,
+                      order.date,
                       style: TextStyle(
                         color: Colors.grey,
                         fontSize: context.setSp(12),
@@ -183,7 +201,7 @@ class OrdersPage extends StatelessWidget {
                     ),
                     Gap(context.setWidth(5)),
                     Text(
-                      items,
+                      order.items,
                       style: TextStyle(
                         color: Colors.grey,
                         fontSize: context.setSp(12),
@@ -201,7 +219,7 @@ class OrdersPage extends StatelessWidget {
                     ),
                     Gap(context.setWidth(5)),
                     Text(
-                      payment,
+                      order.payment,
                       style: TextStyle(
                         color: Colors.grey,
                         fontSize: context.setSp(12),
@@ -216,7 +234,7 @@ class OrdersPage extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  price,
+                  '${order.price} EGP',
                   style: TextStyle(
                     color: HexColor('F5821F'),
                     fontWeight: FontWeight.w900,

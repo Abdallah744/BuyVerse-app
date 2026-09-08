@@ -4,15 +4,29 @@ abstract class ProfileEvent extends Equatable {
   const ProfileEvent();
 
   @override
-  List<Object> get props => [];
+  List<Object?> get props => [];
 }
 
 class GetProfile extends ProfileEvent {}
 
 class UpdateProfile extends ProfileEvent {
   final UserProfile profile;
-  const UpdateProfile(this.profile);
+  final String? profileImagePath;
+  final String? commercialRegisterPath;
+  final String? taxCardPath;
+
+  const UpdateProfile({
+    required this.profile,
+    this.profileImagePath,
+    this.commercialRegisterPath,
+    this.taxCardPath,
+  });
 
   @override
-  List<Object> get props => [profile];
+  List<Object?> get props => [
+    profile,
+    profileImagePath,
+    commercialRegisterPath,
+    taxCardPath,
+  ];
 }

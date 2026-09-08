@@ -4,14 +4,21 @@ import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:hexcolor/hexcolor.dart';
 
+import '../../../../core_layer/admin/helpers/app_localization.dart';
+
 class OrderDetailsPage extends StatelessWidget {
   const OrderDetailsPage({super.key});
 
   @override
   Widget build(BuildContext context) {
+    var l10n = AppLocalizations.of(context);
+
     return Scaffold(
       backgroundColor: HexColor('F7F8FA'),
-      appBar: defaultAppBar(context: context, title: 'Order Details'),
+      appBar: defaultAppBar(
+        context: context,
+        title: l10n?.translate('order_details') ?? 'Order Details',
+      ),
       body: SingleChildScrollView(
         child: Padding(
           padding: EdgeInsets.all(context.setWidth(20.0)),
@@ -20,23 +27,38 @@ class OrderDetailsPage extends StatelessWidget {
             children: [
               _buildHeaderSection(context),
               Gap(context.setHeight(20)),
-              _buildSectionTitle('CUSTOMER', context),
+              _buildSectionTitle(
+                l10n?.translate('customer') ?? 'CUSTOMER',
+                context,
+              ),
               Gap(context.setHeight(10)),
               _buildCustomerSection(context),
               Gap(context.setHeight(20)),
-              _buildSectionTitle('DELIVERY', context),
+              _buildSectionTitle(
+                l10n?.translate('delivery') ?? 'DELIVERY',
+                context,
+              ),
               Gap(context.setHeight(10)),
               _buildDeliverySection(context),
               Gap(context.setHeight(20)),
-              _buildSectionTitle('ORDER ITEMS', context),
+              _buildSectionTitle(
+                l10n?.translate('items') ?? 'ORDER ITEMS',
+                context,
+              ),
               Gap(context.setHeight(10)),
               _buildOrderItemsSection(context),
               Gap(context.setHeight(20)),
-              _buildSectionTitle('PAYMENT', context),
+              _buildSectionTitle(
+                l10n?.translate('payment_method') ?? 'PAYMENT',
+                context,
+              ),
               Gap(context.setHeight(10)),
               _buildPaymentSection(context),
               Gap(context.setHeight(20)),
-              _buildSectionTitle('SUMMARY', context),
+              _buildSectionTitle(
+                l10n?.translate('summary') ?? 'SUMMARY',
+                context,
+              ),
               Gap(context.setHeight(10)),
               _buildSummarySection(context),
               Gap(context.setHeight(20)),
@@ -60,6 +82,7 @@ class OrderDetailsPage extends StatelessWidget {
   }
 
   Widget _buildHeaderSection(BuildContext context) {
+    var l10n = AppLocalizations.of(context);
     return Container(
       padding: EdgeInsets.all(context.setWidth(15)),
       decoration: BoxDecoration(
@@ -100,11 +123,11 @@ class OrderDetailsPage extends StatelessWidget {
                     ),
                     Gap(context.setWidth(6)),
                     Text(
-                      'Pending',
-                      style: TextStyle(
+                      l10n?.translate('pending') ?? 'Pending',
+                      style: const TextStyle(
                         color: Colors.orange,
                         fontWeight: FontWeight.bold,
-                        fontSize: context.setSp(12),
+                        fontSize: 12,
                       ),
                     ),
                   ],
@@ -176,9 +199,9 @@ class OrderDetailsPage extends StatelessWidget {
             children: [
               Icon(Icons.email_outlined, color: Colors.grey[400], size: 18),
               Gap(context.setWidth(10)),
-              Text(
+              const Text(
                 'omar.hassan@email.com',
-                style: TextStyle(color: Colors.grey[600], fontSize: 14),
+                style: TextStyle(color: Colors.grey, fontSize: 14),
               ),
             ],
           ),
@@ -187,9 +210,9 @@ class OrderDetailsPage extends StatelessWidget {
             children: [
               Icon(Icons.phone_outlined, color: Colors.grey[400], size: 18),
               Gap(context.setWidth(10)),
-              Text(
+              const Text(
                 '+20 101 876 5432',
-                style: TextStyle(color: Colors.grey[600], fontSize: 14),
+                style: TextStyle(color: Colors.grey, fontSize: 14),
               ),
             ],
           ),
@@ -199,6 +222,7 @@ class OrderDetailsPage extends StatelessWidget {
   }
 
   Widget _buildDeliverySection(BuildContext context) {
+    var l10n = AppLocalizations.of(context);
     return Container(
       padding: EdgeInsets.all(context.setWidth(15)),
       decoration: BoxDecoration(
@@ -217,10 +241,10 @@ class OrderDetailsPage extends StatelessWidget {
                 size: 20,
               ),
               Gap(context.setWidth(10)),
-              Expanded(
+              const Expanded(
                 child: Text(
                   '45 El Tahrir Square, Cairo, Egypt',
-                  style: TextStyle(color: Colors.grey[800], fontSize: 14),
+                  style: TextStyle(color: Colors.grey, fontSize: 14),
                 ),
               ),
             ],
@@ -231,7 +255,7 @@ class OrderDetailsPage extends StatelessWidget {
               Icon(Icons.map_outlined, color: HexColor('F5821F'), size: 16),
               Gap(context.setWidth(5)),
               Text(
-                'View on Map',
+                l10n?.translate('view_on_map') ?? 'View on Map',
                 style: TextStyle(
                   color: HexColor('F5821F'),
                   fontWeight: FontWeight.bold,
@@ -279,13 +303,13 @@ class OrderDetailsPage extends StatelessWidget {
                     fontSize: context.setSp(15),
                   ),
                 ),
-                Text(
+                const Text(
                   'Electronics',
-                  style: TextStyle(color: Colors.grey[500], fontSize: 13),
+                  style: TextStyle(color: Colors.grey, fontSize: 13),
                 ),
-                Text(
+                const Text(
                   '599 x 1',
-                  style: TextStyle(color: Colors.grey[500], fontSize: 13),
+                  style: TextStyle(color: Colors.grey, fontSize: 13),
                 ),
               ],
             ),
@@ -326,6 +350,7 @@ class OrderDetailsPage extends StatelessWidget {
   }
 
   Widget _buildSummarySection(BuildContext context) {
+    var l10n = AppLocalizations.of(context);
     return Container(
       padding: EdgeInsets.all(context.setWidth(15)),
       decoration: BoxDecoration(
@@ -336,14 +361,14 @@ class OrderDetailsPage extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
-            'Total',
+            l10n?.translate('total_price') ?? 'Total',
             style: TextStyle(
               color: Colors.grey[600],
               fontSize: context.setSp(14),
             ),
           ),
           Text(
-            '599',
+            '599 EGP',
             style: TextStyle(
               color: HexColor('F5821F'),
               fontWeight: FontWeight.w900,
