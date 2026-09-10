@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'package:buy_verse_app/presentation_layer/admin_version/pages/notifications/notifications_page.dart';
 import 'package:buy_verse_app/presentation_layer/admin_version/pages/orders/order_details.dart';
 import 'package:buy_verse_app/presentation_layer/admin_version/pages/orders/orders_page.dart';

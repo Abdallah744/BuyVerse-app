@@ -5,7 +5,7 @@
     <application
         android:label="buy_verse_app"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/launcher_icon">
 
         <!-- Google Maps API Key -->
         <!-- TODO: Replace "YOUR_API_KEY_HERE" with your actual Google Maps API Key from the Google Cloud Console -->

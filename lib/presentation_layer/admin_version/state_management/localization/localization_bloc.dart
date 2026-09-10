@@ -14,8 +14,8 @@ class LocalizationBloc extends Bloc<LocalizationEvent, LocalizationState> {
         emit(LocalizationState(Locale(code)));
       } else {
         emit(
-          const LocalizationState(Locale('ar')),
-        ); // Default to Arabic as requested
+          const LocalizationState(Locale('en')),
+        ); // Default to English as requested
       }
     });
 

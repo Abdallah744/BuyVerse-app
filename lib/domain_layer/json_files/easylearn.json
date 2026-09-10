@@ -1,0 +1,1923 @@
+{
+  "info": {
+    "_postman_id": "a55bf09e-6b29-4a3e-94ea-031dcc760608",
+    "name": "easylearn",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "34114768"
+  },
+  "item": [
+    {
+      "name": "Admin",
+      "item": [
+        {
+          "name": "Auth",
+          "item": [
+            {
+              "name": "OTP",
+              "item": [
+                {
+                  "name": "verify",
+                  "request": {
+                    "method": "POST",
+                    "header": [
+                      {
+                        "key": "x-api-key",
+                        "value": "wQ9KxY7nP2LrA5FmD8TsV1BhE6JzNc4UyRg3KqXpWoMf7CdSaHt9LeIk2On8GbYu",
+                        "type": "text"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\r\n    \"email\": \"raddinnummeuvau-1460@yopmail.com\",\r\n    \"otp_code\": \"204624\"\r\n}",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "{{baseUrl}}/admin/otp/verify",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "admin",
+                        "otp",
+                        "verify"
+                      ]
+                    }
+                  },
+                  "response": []
+                },
+                {
+                  "name": "resend",
+                  "request": {
+                    "method": "POST",
+                    "header": [
+                      {
+                        "key": "x-api-key",
+                        "value": "wQ9KxY7nP2LrA5FmD8TsV1BhE6JzNc4UyRg3KqXpWoMf7CdSaHt9LeIk2On8GbYu",
+                        "type": "text"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\r\n    \"email\": \"raddinnummeuvau-1460@yopmail.com\"\r\n}",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "{{baseUrl}}/admin/otp/resend",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "admin",
+                        "otp",
+                        "resend"
+                      ]
+                    }
+                  },
+                  "response": []
+                }
+              ]
+            },
+            {
+              "name": "login",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "x-api-key",
+                    "value": "wQ9KxY7nP2LrA5FmD8TsV1BhE6JzNc4UyRg3KqXpWoMf7CdSaHt9LeIk2On8GbYu",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"email\": \"raddinnummeuvau-1460@yopmail.com\",\r\n    \"password\": \"123456\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/admin/login",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "admin",
+                    "login"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "logout",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "x-api-key",
+                    "value": "wQ9KxY7nP2LrA5FmD8TsV1BhE6JzNc4UyRg3KqXpWoMf7CdSaHt9LeIk2On8GbYu",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/admin/logout",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "admin",
+                    "logout"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "register",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "x-api-key",
+                    "value": "wQ9KxY7nP2LrA5FmD8TsV1BhE6JzNc4UyRg3KqXpWoMf7CdSaHt9LeIk2On8GbYu",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "name",
+                      "value": "Mohamed Ali",
+                      "type": "text",
+                      "uuid": "0bd9f95e-86be-4cd1-b7ef-9d2407cd06c4"
+                    },
+                    {
+                      "key": "email",
+                      "value": "raddinnummeuvau-1460@yopmail.com",
+                      "type": "text",
+                      "uuid": "17c47923-8e53-4d7d-971e-1b413a6ce682"
+                    },
+                    {
+                      "key": "phone",
+                      "value": "+201013114901",
+                      "type": "text",
+                      "uuid": "15a7e905-b672-468f-955a-b487bf22fe0a"
+                    },
+                    {
+                      "key": "password",
+                      "value": "123456",
+                      "type": "text",
+                      "uuid": "2db0b204-21ec-4910-a5ad-6a879401b1f0"
+                    },
+                    {
+                      "key": "password_confirmation",
+                      "value": "123456",
+                      "type": "text",
+                      "uuid": "57527197-731e-4523-b901-226066213b8c"
+                    },
+                    {
+                      "key": "national_id",
+                      "value": "20402154587882",
+                      "type": "text",
+                      "uuid": "c946c84a-20bc-4430-8dc9-4e4d2faf6029"
+                    },
+                    {
+                      "key": "business_name",
+                      "value": "Koko&S",
+                      "type": "text",
+                      "uuid": "62f8e4e7-88cf-4133-8602-3b5caef75379"
+                    },
+                    {
+                      "key": "address",
+                      "value": "Cairo, Egypt",
+                      "description": "optional",
+                      "type": "text",
+                      "uuid": "f0a5dc31-faaf-4cb8-86e4-a73bdc498b72"
+                    },
+                    {
+                      "key": "latitude",
+                      "value": "30.033333",
+                      "description": "optional",
+                      "type": "text",
+                      "uuid": "3a174062-9aca-4d7c-8c13-a9a927e49ea4"
+                    },
+                    {
+                      "key": "longitude",
+                      "value": "31.233334",
+                      "description": "optional",
+                      "type": "text",
+                      "uuid": "78348d9c-8ea4-4f24-951a-29130c110322"
+                    },
+                    {
+                      "key": "commercial_register",
+                      "description": "optional",
+                      "type": "file",
+                      "uuid": "300b59fa-d165-46c6-bf29-496b3ff3b942",
+                      "src": "extract_from_trade_register_california.jpg"
+                    },
+                    {
+                      "key": "tax_card",
+                      "description": "optional",
+                      "type": "file",
+                      "uuid": "6cc62cf3-20dd-486d-8058-d2e88f83c6be",
+                      "src": "1520165770822.jpeg"
+                    },
+                    {
+                      "key": "picture",
+                      "description": "optional",
+                      "type": "file",
+                      "uuid": "65f87d83-db7a-4b00-bbe2-52f6a7192f45",
+                      "src": "360_F_299042079_vGBD7wIlSeNl7vOevWHiL93G4koMM967.jpg"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/admin/register",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "admin",
+                    "register"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Profile",
+          "item": [
+            {
+              "name": "profile",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "x-api-key",
+                    "value": "wQ9KxY7nP2LrA5FmD8TsV1BhE6JzNc4UyRg3KqXpWoMf7CdSaHt9LeIk2On8GbYu",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/admin/profile",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "admin",
+                    "profile"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "update",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "x-api-key",
+                    "value": "wQ9KxY7nP2LrA5FmD8TsV1BhE6JzNc4UyRg3KqXpWoMf7CdSaHt9LeIk2On8GbYu",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "name",
+                      "value": "Ahmed Elbatal",
+                      "type": "text",
+                      "uuid": "0bd9f95e-86be-4cd1-b7ef-9d2407cd06c4"
+                    },
+                    {
+                      "key": "email",
+                      "value": "a7medelbattal@gmail.com",
+                      "type": "text",
+                      "uuid": "17c47923-8e53-4d7d-971e-1b413a6ce682"
+                    },
+                    {
+                      "key": "phone",
+                      "value": "+201013114673",
+                      "type": "text",
+                      "uuid": "15a7e905-b672-468f-955a-b487bf22fe0a"
+                    },
+                    {
+                      "key": "national_id",
+                      "value": "20402154587887",
+                      "type": "text",
+                      "uuid": "c946c84a-20bc-4430-8dc9-4e4d2faf6029"
+                    },
+                    {
+                      "key": "business_name",
+                      "value": "Elbatal Store",
+                      "type": "text",
+                      "uuid": "62f8e4e7-88cf-4133-8602-3b5caef75379"
+                    },
+                    {
+                      "key": "address",
+                      "value": "Cairo, Egypt",
+                      "description": "optional",
+                      "type": "text",
+                      "uuid": "f0a5dc31-faaf-4cb8-86e4-a73bdc498b72"
+                    },
+                    {
+                      "key": "latitude",
+                      "value": "30.033333",
+                      "description": "optional",
+                      "type": "text",
+                      "uuid": "3a174062-9aca-4d7c-8c13-a9a927e49ea4"
+                    },
+                    {
+                      "key": "longitude",
+                      "value": "31.233334",
+                      "description": "optional",
+                      "type": "text",
+                      "uuid": "78348d9c-8ea4-4f24-951a-29130c110322"
+                    },
+                    {
+                      "key": "commercial_register",
+                      "description": "optional",
+                      "type": "file",
+                      "uuid": "300b59fa-d165-46c6-bf29-496b3ff3b942",
+                      "src": "postman-cloud:///1f148c99-3d7b-4610-8f72-8781a4ef8575"
+                    },
+                    {
+                      "key": "tax_card",
+                      "description": "optional",
+                      "type": "file",
+                      "uuid": "6cc62cf3-20dd-486d-8058-d2e88f83c6be",
+                      "src": "postman-cloud:///1f148c99-c5af-48b0-aee2-a864ed31eece"
+                    },
+                    {
+                      "key": "picture",
+                      "description": "optional",
+                      "type": "file",
+                      "uuid": "65f87d83-db7a-4b00-bbe2-52f6a7192f45",
+                      "src": "postman-cloud:///1f148c9a-6e4e-40c0-afad-f78009171e68"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/admin/profile/update",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "admin",
+                    "profile",
+                    "update"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Category",
+          "item": [
+            {
+              "name": "list",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "x-api-key",
+                    "value": "wQ9KxY7nP2LrA5FmD8TsV1BhE6JzNc4UyRg3KqXpWoMf7CdSaHt9LeIk2On8GbYu",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/admin/categories",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "admin",
+                    "categories"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "store",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "x-api-key",
+                    "value": "wQ9KxY7nP2LrA5FmD8TsV1BhE6JzNc4UyRg3KqXpWoMf7CdSaHt9LeIk2On8GbYu",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"name\": \"Mobile Phone\",\r\n    \"description\": \"\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/admin/categories/store",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "admin",
+                    "categories",
+                    "store"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "update",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "x-api-key",
+                    "value": "wQ9KxY7nP2LrA5FmD8TsV1BhE6JzNc4UyRg3KqXpWoMf7CdSaHt9LeIk2On8GbYu",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"name\": \"Mobile Phone\",\r\n    \"description\": \"\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/admin/categories/update/mobile-phone",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "admin",
+                    "categories",
+                    "update",
+                    "mobile-phone"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "delete",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "x-api-key",
+                    "value": "wQ9KxY7nP2LrA5FmD8TsV1BhE6JzNc4UyRg3KqXpWoMf7CdSaHt9LeIk2On8GbYu",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/admin/categories/destroy/mobile-phone",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "admin",
+                    "categories",
+                    "destroy",
+                    "mobile-phone"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Product",
+          "item": [
+            {
+              "name": "list",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "x-api-key",
+                    "value": "wQ9KxY7nP2LrA5FmD8TsV1BhE6JzNc4UyRg3KqXpWoMf7CdSaHt9LeIk2On8GbYu",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/admin/products",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "admin",
+                    "products"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "details",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "x-api-key",
+                    "value": "wQ9KxY7nP2LrA5FmD8TsV1BhE6JzNc4UyRg3KqXpWoMf7CdSaHt9LeIk2On8GbYu",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/admin/products/show/samsung-a-24",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "admin",
+                    "products",
+                    "show",
+                    "samsung-a-24"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "store",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "x-api-key",
+                    "value": "wQ9KxY7nP2LrA5FmD8TsV1BhE6JzNc4UyRg3KqXpWoMf7CdSaHt9LeIk2On8GbYu",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "name",
+                      "value": "Samsung A 24",
+                      "type": "text",
+                      "uuid": "c700e696-74cf-463c-96cf-0da2f84e196f"
+                    },
+                    {
+                      "key": "price",
+                      "value": "150",
+                      "type": "text",
+                      "uuid": "47b73f67-90f4-49c5-b97d-f4cb7765e5fa"
+                    },
+                    {
+                      "key": "quantity",
+                      "value": "10",
+                      "type": "text",
+                      "uuid": "1d6edf9c-1f80-4eb3-94a3-848cac133ee5"
+                    },
+                    {
+                      "key": "category_id",
+                      "value": "1",
+                      "type": "text",
+                      "uuid": "70133110-bd60-456a-aa83-37096c6dc07d"
+                    },
+                    {
+                      "key": "visible",
+                      "value": "1",
+                      "type": "text",
+                      "uuid": "c3610780-527e-496e-a96d-484000adb27f"
+                    },
+                    {
+                      "key": "description",
+                      "value": ".............",
+                      "description": "optional",
+                      "type": "text",
+                      "uuid": "d8fcb7c4-0351-4f3e-869a-ac179b44b5c5"
+                    },
+                    {
+                      "key": "image",
+                      "description": "optional",
+                      "type": "file",
+                      "uuid": "152e8a9d-834e-42b3-86a5-da0bf2c2eb4e",
+                      "src": "postman-cloud:///1f148c99-c5af-48b0-aee2-a864ed31eece"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/admin/products/store",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "admin",
+                    "products",
+                    "store"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "update",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "x-api-key",
+                    "value": "wQ9KxY7nP2LrA5FmD8TsV1BhE6JzNc4UyRg3KqXpWoMf7CdSaHt9LeIk2On8GbYu",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "name",
+                      "value": "Samsung A 24",
+                      "type": "text",
+                      "uuid": "a3f56940-9d2c-449f-bbb8-f2d3f8bc76d4"
+                    },
+                    {
+                      "key": "price",
+                      "value": "15000",
+                      "type": "text",
+                      "uuid": "7c087367-d7fc-4524-bb83-5a62e36acf6c"
+                    },
+                    {
+                      "key": "quantity",
+                      "value": "5",
+                      "type": "text",
+                      "uuid": "dfb05d35-34c2-4943-a66d-7ea2431c5a2b"
+                    },
+                    {
+                      "key": "category_id",
+                      "value": "1",
+                      "type": "text",
+                      "uuid": "afb74c8c-3b85-4d9a-8490-8efb59c20d81"
+                    },
+                    {
+                      "key": "visible",
+                      "value": "1",
+                      "type": "text",
+                      "uuid": "47a835cd-e9e8-4e7e-8b7b-2a380b75019d"
+                    },
+                    {
+                      "key": "description",
+                      "value": ".............",
+                      "description": "optional",
+                      "type": "text",
+                      "uuid": "bfd64071-697e-4c11-8185-c718178aa970"
+                    },
+                    {
+                      "key": "image",
+                      "description": "optional",
+                      "type": "file",
+                      "uuid": "ff4063e5-a9d0-4964-9b5f-772f72915105",
+                      "src": "postman-cloud:///1f148c99-3d7b-4610-8f72-8781a4ef8575"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/admin/products/update/samsung-a-24",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "admin",
+                    "products",
+                    "update",
+                    "samsung-a-24"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "delete",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "x-api-key",
+                    "value": "wQ9KxY7nP2LrA5FmD8TsV1BhE6JzNc4UyRg3KqXpWoMf7CdSaHt9LeIk2On8GbYu",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/admin/products/destroy/samsung-a-24",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "admin",
+                    "products",
+                    "destroy",
+                    "samsung-a-24"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Order",
+          "item": [
+            {
+              "name": "list",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "x-api-key",
+                    "value": "wQ9KxY7nP2LrA5FmD8TsV1BhE6JzNc4UyRg3KqXpWoMf7CdSaHt9LeIk2On8GbYu",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/admin/orders",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "admin",
+                    "orders"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "details",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "x-api-key",
+                    "value": "wQ9KxY7nP2LrA5FmD8TsV1BhE6JzNc4UyRg3KqXpWoMf7CdSaHt9LeIk2On8GbYu",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/admin/orders/show/e54l21jh",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "admin",
+                    "orders",
+                    "show",
+                    "e54l21jh"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Client",
+      "item": [
+        {
+          "name": "Auth",
+          "item": [
+            {
+              "name": "OTP",
+              "item": [
+                {
+                  "name": "verify",
+                  "request": {
+                    "method": "POST",
+                    "header": [
+                      {
+                        "key": "x-api-key",
+                        "value": "wQ9KxY7nP2LrA5FmD8TsV1BhE6JzNc4UyRg3KqXpWoMf7CdSaHt9LeIk2On8GbYu",
+                        "type": "text"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\r\n    \"email\": \"kemmoutufroza-4817@yopmail.com\",\r\n    \"otp_code\": \"955672\"\r\n}",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "{{baseUrl}}/client/otp/verify",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "client",
+                        "otp",
+                        "verify"
+                      ]
+                    }
+                  },
+                  "response": []
+                },
+                {
+                  "name": "resend",
+                  "request": {
+                    "method": "POST",
+                    "header": [
+                      {
+                        "key": "x-api-key",
+                        "value": "wQ9KxY7nP2LrA5FmD8TsV1BhE6JzNc4UyRg3KqXpWoMf7CdSaHt9LeIk2On8GbYu",
+                        "type": "text"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\r\n    \"email\": \"a7medelbattal@gmail.com\"\r\n}",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "{{baseUrl}}/client/otp/resend",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "client",
+                        "otp",
+                        "resend"
+                      ]
+                    }
+                  },
+                  "response": []
+                }
+              ]
+            },
+            {
+              "name": "login",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "x-api-key",
+                    "value": "wQ9KxY7nP2LrA5FmD8TsV1BhE6JzNc4UyRg3KqXpWoMf7CdSaHt9LeIk2On8GbYu",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"email\": \"kemmoutufroza-4817@yopmail.com\",\r\n    \"password\": \"123456\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/client/login",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "client",
+                    "login"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "logout",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "x-api-key",
+                    "value": "wQ9KxY7nP2LrA5FmD8TsV1BhE6JzNc4UyRg3KqXpWoMf7CdSaHt9LeIk2On8GbYu",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/client/logout",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "client",
+                    "logout"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "register",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "x-api-key",
+                    "value": "wQ9KxY7nP2LrA5FmD8TsV1BhE6JzNc4UyRg3KqXpWoMf7CdSaHt9LeIk2On8GbYu",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "name",
+                      "value": "Ahmed Elbatal",
+                      "type": "text",
+                      "uuid": "0bd9f95e-86be-4cd1-b7ef-9d2407cd06c4"
+                    },
+                    {
+                      "key": "email",
+                      "value": "a7medelbattal@gmail.com",
+                      "type": "text",
+                      "uuid": "17c47923-8e53-4d7d-971e-1b413a6ce682"
+                    },
+                    {
+                      "key": "phone",
+                      "value": "+201013114673",
+                      "type": "text",
+                      "uuid": "15a7e905-b672-468f-955a-b487bf22fe0a"
+                    },
+                    {
+                      "key": "password",
+                      "value": "123456",
+                      "type": "text",
+                      "uuid": "2db0b204-21ec-4910-a5ad-6a879401b1f0"
+                    },
+                    {
+                      "key": "password_confirmation",
+                      "value": "123456",
+                      "type": "text",
+                      "uuid": "57527197-731e-4523-b901-226066213b8c"
+                    },
+                    {
+                      "key": "address",
+                      "value": "Cairo, Egypt",
+                      "type": "text",
+                      "uuid": "f0a5dc31-faaf-4cb8-86e4-a73bdc498b72",
+                      "description": "optional"
+                    },
+                    {
+                      "key": "latitude",
+                      "value": "30.033333",
+                      "type": "text",
+                      "uuid": "3a174062-9aca-4d7c-8c13-a9a927e49ea4",
+                      "description": "optional"
+                    },
+                    {
+                      "key": "longitude",
+                      "value": "31.233334",
+                      "type": "text",
+                      "uuid": "78348d9c-8ea4-4f24-951a-29130c110322",
+                      "description": "optional"
+                    },
+                    {
+                      "key": "picture",
+                      "type": "file",
+                      "uuid": "65f87d83-db7a-4b00-bbe2-52f6a7192f45",
+                      "description": "optional",
+                      "src": "postman-cloud:///1f148c99-c5af-48b0-aee2-a864ed31eece"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/client/register",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "client",
+                    "register"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Profile",
+          "item": [
+            {
+              "name": "profile",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "x-api-key",
+                    "value": "wQ9KxY7nP2LrA5FmD8TsV1BhE6JzNc4UyRg3KqXpWoMf7CdSaHt9LeIk2On8GbYu",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/client/profile",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "client",
+                    "profile"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "update",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "x-api-key",
+                    "value": "wQ9KxY7nP2LrA5FmD8TsV1BhE6JzNc4UyRg3KqXpWoMf7CdSaHt9LeIk2On8GbYu",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "name",
+                      "value": "Ahmed Elbatal",
+                      "type": "text",
+                      "uuid": "0bd9f95e-86be-4cd1-b7ef-9d2407cd06c4"
+                    },
+                    {
+                      "key": "email",
+                      "value": "kemmoutufroza-4817@yopmail.com",
+                      "type": "text",
+                      "uuid": "17c47923-8e53-4d7d-971e-1b413a6ce682"
+                    },
+                    {
+                      "key": "phone",
+                      "value": "+201013114673",
+                      "type": "text",
+                      "uuid": "15a7e905-b672-468f-955a-b487bf22fe0a"
+                    },
+                    {
+                      "key": "address",
+                      "value": "Cairo, Egypt",
+                      "type": "text",
+                      "uuid": "f0a5dc31-faaf-4cb8-86e4-a73bdc498b72",
+                      "description": "optional"
+                    },
+                    {
+                      "key": "latitude",
+                      "value": "30.033333",
+                      "type": "text",
+                      "uuid": "3a174062-9aca-4d7c-8c13-a9a927e49ea4",
+                      "description": "optional"
+                    },
+                    {
+                      "key": "longitude",
+                      "value": "31.233334",
+                      "type": "text",
+                      "uuid": "78348d9c-8ea4-4f24-951a-29130c110322",
+                      "description": "optional"
+                    },
+                    {
+                      "key": "picture",
+                      "type": "file",
+                      "uuid": "65f87d83-db7a-4b00-bbe2-52f6a7192f45",
+                      "description": "optional",
+                      "src": "postman-cloud:///1f148c99-c5af-48b0-aee2-a864ed31eece"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/client/profile/update",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "client",
+                    "profile",
+                    "update"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Category",
+          "item": [
+            {
+              "name": "list",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "x-api-key",
+                    "value": "wQ9KxY7nP2LrA5FmD8TsV1BhE6JzNc4UyRg3KqXpWoMf7CdSaHt9LeIk2On8GbYu",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/client/categories",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "client",
+                    "categories"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Product",
+          "item": [
+            {
+              "name": "list",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "x-api-key",
+                    "value": "wQ9KxY7nP2LrA5FmD8TsV1BhE6JzNc4UyRg3KqXpWoMf7CdSaHt9LeIk2On8GbYu",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/client/products",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "client",
+                    "products"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "details",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "x-api-key",
+                    "value": "wQ9KxY7nP2LrA5FmD8TsV1BhE6JzNc4UyRg3KqXpWoMf7CdSaHt9LeIk2On8GbYu",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/client/products/show/samsung-a-24",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "client",
+                    "products",
+                    "show",
+                    "samsung-a-24"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Favorite",
+          "item": [
+            {
+              "name": "list",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "x-api-key",
+                    "value": "wQ9KxY7nP2LrA5FmD8TsV1BhE6JzNc4UyRg3KqXpWoMf7CdSaHt9LeIk2On8GbYu",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/client/favorites",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "client",
+                    "favorites"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "store",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "x-api-key",
+                    "value": "wQ9KxY7nP2LrA5FmD8TsV1BhE6JzNc4UyRg3KqXpWoMf7CdSaHt9LeIk2On8GbYu",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"product_id\": 2\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/client/favorites/store",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "client",
+                    "favorites",
+                    "store"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "delete",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "x-api-key",
+                    "value": "wQ9KxY7nP2LrA5FmD8TsV1BhE6JzNc4UyRg3KqXpWoMf7CdSaHt9LeIk2On8GbYu",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"product_id\": 2\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/client/favorites/destroy",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "client",
+                    "favorites",
+                    "destroy"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Cart",
+          "item": [
+            {
+              "name": "list",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "x-api-key",
+                    "value": "wQ9KxY7nP2LrA5FmD8TsV1BhE6JzNc4UyRg3KqXpWoMf7CdSaHt9LeIk2On8GbYu",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/client/carts",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "client",
+                    "carts"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "store",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "x-api-key",
+                    "value": "wQ9KxY7nP2LrA5FmD8TsV1BhE6JzNc4UyRg3KqXpWoMf7CdSaHt9LeIk2On8GbYu",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"product_id\": 2,\r\n    \"quantity\": 2\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/client/carts/store",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "client",
+                    "carts",
+                    "store"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "delete",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "x-api-key",
+                    "value": "wQ9KxY7nP2LrA5FmD8TsV1BhE6JzNc4UyRg3KqXpWoMf7CdSaHt9LeIk2On8GbYu",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"product_id\": 1\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/client/carts/destroy",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "client",
+                    "carts",
+                    "destroy"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Order",
+          "item": [
+            {
+              "name": "list",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "x-api-key",
+                    "value": "wQ9KxY7nP2LrA5FmD8TsV1BhE6JzNc4UyRg3KqXpWoMf7CdSaHt9LeIk2On8GbYu",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/client/orders",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "client",
+                    "orders"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "details",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "x-api-key",
+                    "value": "wQ9KxY7nP2LrA5FmD8TsV1BhE6JzNc4UyRg3KqXpWoMf7CdSaHt9LeIk2On8GbYu",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/client/orders/show/e54l21jh",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "client",
+                    "orders",
+                    "show",
+                    "e54l21jh"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "store",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "x-api-key",
+                    "value": "wQ9KxY7nP2LrA5FmD8TsV1BhE6JzNc4UyRg3KqXpWoMf7CdSaHt9LeIk2On8GbYu",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"product_id\": [1, 2],\r\n    \"quantity\": [2, 1],\r\n    \"price\": [300.00, 150.00],\r\n    \"address\": \"Cairo, Egypt\",\r\n    \"latitude\": 30.033333,\r\n    \"longitude\": 31.233334,\r\n    \"payment_method\": \"card\" // cash - card\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/client/orders/store",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "client",
+                    "orders",
+                    "store"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "pay",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "x-api-key",
+                    "value": "wQ9KxY7nP2LrA5FmD8TsV1BhE6JzNc4UyRg3KqXpWoMf7CdSaHt9LeIk2On8GbYu",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/client/orders/pay/3P0TEQV4",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "client",
+                    "orders",
+                    "pay",
+                    "3P0TEQV4"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Payment",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-api-key",
+                "value": "wQ9KxY7nP2LrA5FmD8TsV1BhE6JzNc4UyRg3KqXpWoMf7CdSaHt9LeIk2On8GbYu",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n        \"gateway_type\": \"paymob\",\r\n        \"amount\": 150,\r\n        \"currency\": \"EGP\",\r\n        \"first_name\": \"Mahmoud Talal\",\r\n        \"last_name\": \"Mahmoud Talal\",\r\n        \"phone_number\": \"\",\r\n        \"email\": \"\",\r\n        \"code\": \"6a8b5fbff3367\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/client/payments/process",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "client",
+                "payments",
+                "process"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          "pm.request.headers.upsert({\r",
+          "    key: \"x-api-key\",\r",
+          "    value: pm.collectionVariables.get(\"x-api-key\")\r",
+          "});"
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": ""
+    },
+    {
+      "key": "x-api-key",
+      "value": ""
+    },
+    {
+      "key": "token",
+      "secret": true
+    }
+  ]
+}

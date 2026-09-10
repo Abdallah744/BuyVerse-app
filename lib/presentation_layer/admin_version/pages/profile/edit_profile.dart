@@ -503,7 +503,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
     VoidCallback? onDelete,
   }) {
     return InkWell(
-      onTap: isUploaded ? null : onTap,
+      onTap: onTap,
       child: Container(
         padding: EdgeInsets.symmetric(
           horizontal: context.setWidth(15),

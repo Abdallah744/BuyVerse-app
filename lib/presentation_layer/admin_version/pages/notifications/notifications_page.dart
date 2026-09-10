@@ -1,4 +1,7 @@
+import 'package:buy_verse_app/presentation_layer/admin_version/pages/product_pages/products/product_details.dart';
 import 'package:buy_verse_app/presentation_layer/admin_version/state_management/notification/notification_bloc.dart';
+import 'package:buy_verse_app/presentation_layer/admin_version/state_management/product/product_bloc.dart';
+import 'package:buy_verse_app/presentation_layer/admin_version/widgets/componants.dart';
 import 'package:buy_verse_app/presentation_layer/admin_version/widgets/responsive_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -36,17 +39,27 @@ class NotificationsPage extends StatelessWidget {
           ),
         ),
         actions: [
-          TextButton(
-            onPressed: () {
-              context.read<NotificationBloc>().add(MarkAllAsRead());
+          BlocBuilder<NotificationBloc, NotificationState>(
+            builder: (context, state) {
+              bool hasUnread = false;
+              if (state is NotificationLoaded) {
+                hasUnread = state.unreadCount > 0;
+              }
+              return TextButton(
+                onPressed: hasUnread
+                    ? () {
+                        context.read<NotificationBloc>().add(MarkAllAsRead());
+                      }
+                    : null,
+                child: Text(
+                  l10n?.translate('mark_all_as_read') ?? 'Mark all',
+                  style: TextStyle(
+                    color: hasUnread ? Colors.white : Colors.white.withValues(alpha: 0.5),
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              );
             },
-            child: Text(
-              l10n?.translate('mark_all_as_read') ?? 'Mark all',
-              style: const TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
           ),
         ],
       ),
@@ -80,83 +93,116 @@ class NotificationsPage extends StatelessWidget {
               padding: EdgeInsets.all(context.setWidth(20)),
               itemBuilder: (context, index) {
                 final notification = state.notifications[index];
-                return Container(
-                  padding: EdgeInsets.all(context.setWidth(15)),
-                  decoration: BoxDecoration(
-                    color: notification.isRead
-                        ? Colors.white
-                        : HexColor('F5821F').withValues(alpha: 0.05),
-                    borderRadius: BorderRadius.circular(15),
-                    border: notification.isRead
-                        ? null
-                        : Border.all(
-                            color: HexColor('F5821F').withValues(alpha: 0.2),
-                          ),
-                  ),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          color: notification.isRead
-                              ? Colors.grey[100]
-                              : HexColor('F5821F').withValues(alpha: 0.1),
-                          shape: BoxShape.circle,
-                        ),
-                        child: Icon(
-                          notification.isRead
-                              ? Icons.notifications_outlined
-                              : Icons.notifications_active,
-                          color: notification.isRead
-                              ? Colors.grey
-                              : HexColor('F5821F'),
-                          size: 20,
-                        ),
-                      ),
-                      const Gap(15),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              notification.title,
-                              style: TextStyle(
-                                fontWeight: notification.isRead
-                                    ? FontWeight.w600
-                                    : FontWeight.bold,
-                                fontSize: context.setSp(16),
-                              ),
+                return InkWell(
+                  onTap: () {
+                    // Mark as read
+                    if (!notification.isRead) {
+                      context.read<NotificationBloc>().add(
+                        MarkAsRead(notification.id),
+                      );
+                    }
+
+                    // Handle Navigation
+                    if (notification.type == 'product' &&
+                        notification.targetId != null) {
+                      final productState = context.read<ProductBloc>().state;
+                      if (productState is ProductLoaded) {
+                        try {
+                          final product = productState.products.firstWhere(
+                            (p) => p.id == notification.targetId,
+                          );
+                          navigateTo(
+                            context,
+                            ProductDetailsPage(product: product),
+                          );
+                        } catch (e) {
+                          print('Product not found for notification');
+                        }
+                      }
+                    } else if (notification.type == 'order' &&
+                        notification.targetId != null) {
+                      // Navigate to order details if implemented
+                      // navigateTo(context, OrderDetailsPage(orderId: notification.targetId));
+                    }
+                  },
+                  child: Container(
+                    padding: EdgeInsets.all(context.setWidth(15)),
+                    decoration: BoxDecoration(
+                      color: notification.isRead
+                          ? Colors.white
+                          : HexColor('F5821F').withValues(alpha: 0.05),
+                      borderRadius: BorderRadius.circular(15),
+                      border: notification.isRead
+                          ? null
+                          : Border.all(
+                              color: HexColor('F5821F').withValues(alpha: 0.2),
                             ),
-                            const Gap(5),
-                            Text(
-                              notification.body,
-                              style: TextStyle(
-                                color: Colors.grey[600],
-                                fontSize: context.setSp(14),
-                              ),
-                            ),
-                            const Gap(10),
-                            Text(
-                              notification.date,
-                              style: TextStyle(
-                                color: Colors.grey[400],
-                                fontSize: context.setSp(12),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      if (!notification.isRead)
+                    ),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
                         Container(
-                          width: 10,
-                          height: 10,
+                          padding: const EdgeInsets.all(10),
                           decoration: BoxDecoration(
-                            color: HexColor('F5821F'),
+                            color: notification.isRead
+                                ? Colors.grey[100]
+                                : HexColor('F5821F').withValues(alpha: 0.1),
                             shape: BoxShape.circle,
                           ),
+                          child: Icon(
+                            notification.isRead
+                                ? Icons.notifications_outlined
+                                : Icons.notifications_active,
+                            color: notification.isRead
+                                ? Colors.grey
+                                : HexColor('F5821F'),
+                            size: 20,
+                          ),
                         ),
-                    ],
+                        const Gap(15),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                notification.title,
+                                style: TextStyle(
+                                  fontWeight: notification.isRead
+                                      ? FontWeight.w600
+                                      : FontWeight.bold,
+                                  fontSize: context.setSp(16),
+                                ),
+                              ),
+                              const Gap(5),
+                              Text(
+                                notification.body,
+                                style: TextStyle(
+                                  color: Colors.grey[600],
+                                  fontSize: context.setSp(14),
+                                ),
+                              ),
+                              const Gap(10),
+                              Text(
+                                notification.date,
+                                style: TextStyle(
+                                  color: Colors.grey[400],
+                                  fontSize: context.setSp(12),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        if (!notification.isRead)
+                          Container(
+                            width: 10,
+                            height: 10,
+                            decoration: BoxDecoration(
+                              color: HexColor('F5821F'),
+                              shape: BoxShape.circle,
+                            ),
+                          ),
+                      ],
+                    ),
                   ),
                 );
               },

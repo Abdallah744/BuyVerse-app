@@ -18,6 +18,13 @@ class GetNotifications extends NotificationEvent {}
 
 class MarkAllAsRead extends NotificationEvent {}
 
+class MarkAsRead extends NotificationEvent {
+  final String notificationId;
+  const MarkAsRead(this.notificationId);
+  @override
+  List<Object> get props => [notificationId];
+}
+
 class UpdateNotificationList extends NotificationEvent {
   final List<NotificationModel> notifications;
   const UpdateNotificationList(this.notifications);
@@ -108,6 +115,22 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
         }
 
         await batch.commit();
+      } catch (e) {
+        // Handle error
+      }
+    });
+
+    on<MarkAsRead>((event, emit) async {
+      try {
+        String? uId = CacheHelper.getData(key: 'uId');
+        if (uId == null) return;
+
+        await FirebaseFirestore.instance
+            .collection('admin')
+            .doc(uId)
+            .collection('notifications')
+            .doc(event.notificationId)
+            .update({'isRead': true});
       } catch (e) {
         // Handle error
       }

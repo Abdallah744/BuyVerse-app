@@ -1,24 +1,38 @@
-import 'package:buy_verse_app/core_layer/admin/helpers/dio_helper.dart';
 import 'package:dio/dio.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../data_layer/admin/admin_models/category.dart';
+import '../../../../domain_layer/admin/usecases/base_usecase.dart';
+import '../../../../domain_layer/admin/usecases/category/category_usecases.dart';
 
 part 'category_event.dart';
 part 'category_state.dart';
 
 class CategoryBloc extends Bloc<CategoryEvent, CategoryState> {
-  CategoryBloc() : super(CategoryInitial()) {
+  final GetCategoriesUseCase getCategoriesUseCase;
+  final AddCategoryUseCase addCategoryUseCase;
+  final EditCategoryUseCase editCategoryUseCase;
+  final DeleteCategoryUseCase deleteCategoryUseCase;
+
+  CategoryBloc({
+    required this.getCategoriesUseCase,
+    required this.addCategoryUseCase,
+    required this.editCategoryUseCase,
+    required this.deleteCategoryUseCase,
+  }) : super(CategoryInitial()) {
     on<GetCategories>((event, emit) async {
+      print('DEBUG: Fetching Categories...');
       emit(CategoryLoading());
       try {
-        final response = await DioHelper.getData(url: '/admin/categories');
+        final response = await getCategoriesUseCase(NoParams());
+        print('DEBUG: Categories Response Data: ${response.data}');
+
         if (response.statusCode == 200 && response.data['data'] != null) {
           final List<dynamic> data = response.data['data'];
           final categories = data.map((json) {
             return Category(
-              id: json['slug'] ?? json['id']?.toString() ?? '',
+              id: json['id']?.toString() ?? json['slug'] ?? '',
               name: json['name'] ?? '',
               description: json['description'] ?? '',
             );
@@ -34,12 +48,11 @@ class CategoryBloc extends Bloc<CategoryEvent, CategoryState> {
 
     on<AddCategory>((event, emit) async {
       try {
-        final response = await DioHelper.postData(
-          url: '/admin/categories/store',
-          data: {
-            'name': event.category.name,
-            'description': event.category.description,
-          },
+        final response = await addCategoryUseCase(
+          CategoryParams(
+            name: event.category.name,
+            description: event.category.description,
+          ),
         );
 
         if (response.statusCode == 200 || response.statusCode == 201) {
@@ -61,12 +74,12 @@ class CategoryBloc extends Bloc<CategoryEvent, CategoryState> {
 
     on<EditCategory>((event, emit) async {
       try {
-        final response = await DioHelper.putData(
-          url: '/admin/categories/update/${event.category.id}',
-          data: {
-            'name': event.category.name,
-            'description': event.category.description,
-          },
+        final response = await editCategoryUseCase(
+          EditCategoryParams(
+            id: event.category.id,
+            name: event.category.name,
+            description: event.category.description,
+          ),
         );
 
         if (response.statusCode == 200) {
@@ -88,9 +101,7 @@ class CategoryBloc extends Bloc<CategoryEvent, CategoryState> {
 
     on<DeleteCategory>((event, emit) async {
       try {
-        final response = await DioHelper.deleteData(
-          url: '/admin/categories/destroy/${event.id}',
-        );
+        final response = await deleteCategoryUseCase(event.id);
 
         if (response.statusCode == 200) {
           add(GetCategories());

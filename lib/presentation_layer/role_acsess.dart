@@ -1,3 +1,4 @@
+import 'package:buy_verse_app/core_layer/admin/helpers/cache_helper.dart';
 import 'package:buy_verse_app/presentation_layer/admin_version/pages/login&register/login_screen.dart';
 import 'package:buy_verse_app/presentation_layer/admin_version/widgets/componants.dart';
 import 'package:flutter/material.dart';
@@ -61,12 +62,22 @@ class _RoleAccessRestrictionState extends State<RoleAccessRestriction> {
                 width: 300,
                 context: context,
                 function: () {
-                  if (selectedRole != null) {
-                    print('Selected: $selectedRole');
-                    navigateTo(context, LoginScreen());
+                  if (selectedRole == 'Seller') {
+                    CacheHelper.saveData(key: 'role', value: 'admin');
+                    navigateTo(context, const LoginScreen());
+                  } else if (selectedRole == 'Customer') {
+                    CacheHelper.saveData(key: 'role', value: 'customer');
+                    showToast(
+                      context: context,
+                      text: 'Customer interface is under development',
+                      state: ToastStates.WARNING,
+                    );
                   }
                 },
                 text: 'Continue',
+                background: selectedRole != null
+                    ? HexColor('F5821F')
+                    : Colors.grey[400]!,
               ),
             ],
           ),

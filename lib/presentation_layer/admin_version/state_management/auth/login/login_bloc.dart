@@ -1,90 +1,105 @@
+// ignore_for_file: avoid_print
+
 import 'package:dio/dio.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../../../core_layer/admin/helpers/cache_helper.dart';
 import '../../../../../core_layer/admin/helpers/dio_helper.dart';
+import '../../../../../domain_layer/admin/usecases/auth/auth_usecases.dart';
+import '../../../../../domain_layer/admin/usecases/base_usecase.dart';
 import 'login_event.dart';
 import 'login_state.dart';
 
 String _parseError(dynamic errorResponse) {
   if (errorResponse is Map) {
-    if (errorResponse['message'] != null) {
-      if (errorResponse['message'] is Map) {
-        Map<String, dynamic> errors = errorResponse['message'];
-        if (errors.isNotEmpty) {
-          var firstKey = errors.keys.first;
-          var firstError = errors[firstKey];
-          if (firstError is List && firstError.isNotEmpty) {
-            return "$firstKey: ${firstError[0]}";
-          }
-          return "$firstKey: $firstError";
+    if (errorResponse['errors'] != null && errorResponse['errors'] is Map) {
+      var errors = errorResponse['errors'] as Map;
+      if (errors.isNotEmpty) {
+        var firstKey = errors.keys.first;
+        var firstError = errors[firstKey];
+        if (firstError is List && firstError.isNotEmpty) {
+          return "$firstKey: ${firstError[0]}";
         }
+        return "$firstKey: $firstError";
       }
-      return errorResponse['message'].toString();
     }
-    if (errorResponse.isNotEmpty) {
-      var firstKey = errorResponse.keys.first;
-      var firstError = errorResponse[firstKey];
-      if (firstError is List && firstError.isNotEmpty) {
-        return "$firstKey: ${firstError[0]}";
-      }
-      return "$firstKey: $firstError";
+    if (errorResponse['message'] != null) {
+      return errorResponse['message'].toString();
     }
   }
   return errorResponse?.toString() ?? 'Operation failed';
 }
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
-  AuthBloc() : super(AuthInitial()) {
+  final LoginUseCase loginUseCase;
+  final RegisterUseCase registerUseCase;
+  final VerifyOtpUseCase verifyOtpUseCase;
+  final LogoutUseCase logoutUseCase;
+
+  AuthBloc({
+    required this.loginUseCase,
+    required this.registerUseCase,
+    required this.verifyOtpUseCase,
+    required this.logoutUseCase,
+  }) : super(AuthInitial()) {
     on<LoginRequested>((event, emit) async {
       print('DEBUG: LoginRequested for email: ${event.email}');
       emit(AuthLoading());
       try {
-        final response = await DioHelper.postData(
-          url: '/admin/login',
-          data: {'email': event.email, 'password': event.password},
+        final response = await loginUseCase(
+          LoginParams(email: event.email, password: event.password),
         );
 
-        print('DEBUG: Response Status Code: ${response.statusCode}');
-        print('DEBUG: Response Data: ${response.data}');
+        final responseData = response.data;
+        print('DEBUG: Login Full Response: $responseData');
 
         if (response.statusCode == 200) {
-          final responseData = response.data;
-          if (responseData != null && responseData['data'] != null) {
-            final data = responseData['data'];
-            final token = data['token'];
-            final uId = data['id'].toString();
-
-            await CacheHelper.saveData(key: 'token', value: token);
-            await CacheHelper.saveData(key: 'uId', value: uId);
-            await CacheHelper.saveData(key: 'isVerified', value: true);
-
-            emit(Authenticated(uId));
-          } else if (responseData != null &&
+          if (responseData != null &&
               responseData['message'] != null &&
-              responseData['message']
-                  .toString()
-                  .toLowerCase()
-                  .contains('otp')) {
+              responseData['message'].toString().toLowerCase().contains(
+                'otp',
+              )) {
+            print('DEBUG: Login requires OTP verification');
             await CacheHelper.saveData(key: 'isVerified', value: false);
             emit(const AuthError('VERIFICATION_REQUIRED'));
+          } else if (responseData != null) {
+            final token =
+                responseData['token']?.toString() ??
+                responseData['data']?['token']?.toString();
+            final data = responseData['data'];
+            final uId = data != null
+                ? data['id']?.toString()
+                : responseData['id']?.toString();
+
+            if (token != null && uId != null) {
+              print('DEBUG: Login Success. Saving token: $token');
+              DioHelper.token = token; // Update static token in memory
+              await CacheHelper.saveData(key: 'token', value: token);
+              await CacheHelper.saveData(key: 'uId', value: uId);
+              await CacheHelper.saveData(key: 'isVerified', value: true);
+              await CacheHelper.saveData(
+                key: 'verified_${event.email}',
+                value: true,
+              );
+
+              emit(Authenticated(uId));
+            } else {
+              print(
+                'DEBUG: Login 200 but token or uId is null. Token: $token, uId: $uId',
+              );
+              emit(AuthError('Invalid user data received from server'));
+            }
           } else {
-            emit(AuthError('Invalid response format: "data" field missing'));
+            print('DEBUG: Login 200 but data is null');
+            emit(AuthError('Server error: Data is missing'));
           }
         } else {
-          print('DEBUG: Login Failed with status ${response.statusCode}');
-          emit(AuthError(_parseError(response.data)));
+          print('DEBUG: Login failed status: ${response.statusCode}');
+          emit(AuthError(_parseError(responseData)));
         }
       } catch (e) {
         print('DEBUG: Login Exception: $e');
         if (e is DioException) {
-          print('DEBUG: Dio Error Type: ${e.type}');
-          print('DEBUG: Dio Error Response: ${e.response?.data}');
-          emit(
-            AuthError(
-              _parseError(e.response?.data) ?? e.message ?? 'Login failed',
-            ),
-          );
+          emit(AuthError(_parseError(e.response?.data)));
         } else {
           emit(AuthError(e.toString()));
         }
@@ -92,6 +107,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     });
 
     on<RegisterRequested>((event, emit) async {
+      print('DEBUG: RegisterRequested');
       emit(AuthLoading());
       try {
         FormData formData = FormData.fromMap({
@@ -118,7 +134,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
             ),
           );
         }
-
         if (event.commercialRegisterPath != null) {
           formData.files.add(
             MapEntry(
@@ -130,7 +145,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
             ),
           );
         }
-
         if (event.taxCardPath != null) {
           formData.files.add(
             MapEntry(
@@ -143,37 +157,41 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           );
         }
 
-        final response = await DioHelper.postData(
-          url: '/admin/register',
-          data: formData,
-        );
+        final response = await registerUseCase(formData);
+        final responseData = response.data;
+        print('DEBUG: Register Full Response: $responseData');
 
         if (response.statusCode == 200 || response.statusCode == 201) {
-          final responseData = response.data;
-          if (responseData != null && responseData['data'] != null) {
+          if (responseData != null) {
+            final token =
+                responseData['token']?.toString() ??
+                responseData['data']?['token']?.toString();
             final data = responseData['data'];
-            final token = data['token'];
-            final uId = data['id'].toString();
+            final uId = data != null
+                ? data['id']?.toString()
+                : responseData['id']?.toString();
 
-            await CacheHelper.saveData(key: 'token', value: token);
-            await CacheHelper.saveData(key: 'uId', value: uId);
-
-            emit(Authenticated(uId));
+            if (token != null && uId != null) {
+              DioHelper.token = token; // Update static token in memory
+              await CacheHelper.saveData(key: 'token', value: token);
+              await CacheHelper.saveData(key: 'uId', value: uId);
+              await CacheHelper.saveData(
+                key: 'verified_${event.profile.email}',
+                value: true,
+              );
+              emit(Authenticated(uId));
+            } else {
+              emit(AuthError('Registration success, please login'));
+            }
           } else {
-            emit(AuthError('Invalid response format: "data" field missing'));
+            emit(AuthError('Registration success, please login'));
           }
         } else {
-          emit(AuthError(_parseError(response.data)));
+          emit(AuthError(_parseError(responseData)));
         }
       } catch (e) {
         if (e is DioException) {
-          emit(
-            AuthError(
-              _parseError(e.response?.data) ??
-                  e.message ??
-                  'Registration failed',
-            ),
-          );
+          emit(AuthError(_parseError(e.response?.data)));
         } else {
           emit(AuthError(e.toString()));
         }
@@ -182,14 +200,93 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
     on<LogoutRequested>((event, emit) async {
       try {
-        await DioHelper.postData(url: '/admin/logout');
+        await logoutUseCase(NoParams());
+      } finally {
         await CacheHelper.removeData(key: 'token');
         await CacheHelper.removeData(key: 'uId');
+        DioHelper.token = null; // Clear static token
         emit(Unauthenticated());
+      }
+    });
+
+    on<VerifyOtpRequested>((event, emit) async {
+      print('DEBUG: VerifyOtpRequested for: ${event.email}');
+      emit(AuthLoading());
+      try {
+        final response = await verifyOtpUseCase(
+          OtpParams(email: event.email, otp: event.otp),
+        );
+
+        final responseData = response.data;
+        print('DEBUG: OTP Verify Full Response: $responseData');
+
+        if (response.statusCode == 200) {
+          if (responseData != null) {
+            final token =
+                responseData['token']?.toString() ??
+                responseData['data']?['token']?.toString();
+            final data = responseData['data'];
+            final uId = data != null
+                ? data['id']?.toString()
+                : responseData['id']?.toString();
+
+            if (token != null) {
+              print('DEBUG: OTP Success. Saving token to memory: $token');
+              DioHelper.token =
+                  token; // CRITICAL FIX: Save to memory immediately
+              await CacheHelper.saveData(key: 'token', value: token);
+              if (uId != null) {
+                await CacheHelper.saveData(key: 'uId', value: uId);
+              }
+              await CacheHelper.saveData(
+                key: 'verified_${event.email}',
+                value: true,
+              );
+              await CacheHelper.saveData(key: 'isVerified', value: true);
+
+              emit(OtpVerified());
+            } else {
+              print(
+                'DEBUG: OTP Success but no token in response. Token: $token',
+              );
+              await CacheHelper.saveData(
+                key: 'verified_${event.email}',
+                value: true,
+              );
+              await CacheHelper.saveData(key: 'isVerified', value: true);
+              emit(OtpVerified());
+            }
+          } else {
+            print('DEBUG: OTP Verified but response data is null');
+            await CacheHelper.saveData(
+              key: 'verified_${event.email}',
+              value: true,
+            );
+            await CacheHelper.saveData(key: 'isVerified', value: true);
+            emit(OtpVerified());
+          }
+        } else {
+          emit(AuthError(_parseError(responseData)));
+        }
       } catch (e) {
-        await CacheHelper.removeData(key: 'token');
-        await CacheHelper.removeData(key: 'uId');
-        emit(Unauthenticated());
+        print('DEBUG: OTP Verify Exception: $e');
+        if (e is DioException) {
+          emit(AuthError(_parseError(e.response?.data)));
+        } else {
+          emit(AuthError(e.toString()));
+        }
+      }
+    });
+
+    on<ResendOtpRequested>((event, emit) async {
+      try {
+        await DioHelper.postData(
+          url: '/admin/otp/resend',
+          data: {'email': event.email},
+        );
+        emit(OtpResent());
+      } catch (e) {
+        // Log or handle
       }
     });
   }

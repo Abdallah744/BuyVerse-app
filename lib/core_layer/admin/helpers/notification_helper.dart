@@ -36,6 +36,8 @@ class NotificationHelper {
     required String title,
     required String body,
     bool saveToFirestore = false,
+    String? type,
+    String? targetId,
   }) async {
     const AndroidNotificationDetails androidPlatformChannelSpecifics =
         AndroidNotificationDetails(
@@ -58,13 +60,15 @@ class NotificationHelper {
     );
 
     if (saveToFirestore) {
-      await _saveNotificationToFirestore(title, body);
+      await _saveNotificationToFirestore(title, body, type, targetId);
     }
   }
 
   static Future<void> _saveNotificationToFirestore(
     String title,
     String body,
+    String? type,
+    String? targetId,
   ) async {
     try {
       String? uId = CacheHelper.getData(key: 'uId');
@@ -79,6 +83,8 @@ class NotificationHelper {
             'body': body,
             'date': DateFormat('MMM dd, yyyy - hh:mm a').format(DateTime.now()),
             'isRead': false,
+            'type': type,
+            'targetId': targetId,
             'createdAt': FieldValue.serverTimestamp(),
           });
     } catch (e) {

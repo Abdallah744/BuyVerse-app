@@ -177,7 +177,10 @@ class _MapPickerScreenState extends State<MapPickerScreen> {
                             onPressed: _pickedLocation == null
                                 ? null
                                 : () {
-                                    Navigator.pop(context, _address);
+                                    Navigator.pop(
+                                      context,
+                                      '${_pickedLocation!.latitude}, ${_pickedLocation!.longitude}',
+                                    );
                                   },
                             child: const Text(
                               'Confirm Location',

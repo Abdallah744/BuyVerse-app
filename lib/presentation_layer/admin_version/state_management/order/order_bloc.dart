@@ -1,18 +1,21 @@
-import 'package:buy_verse_app/core_layer/admin/helpers/dio_helper.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../data_layer/admin/admin_models/order.dart';
+import '../../../../domain_layer/admin/usecases/base_usecase.dart';
+import '../../../../domain_layer/admin/usecases/order/order_usecases.dart';
 
 part 'order_event.dart';
 part 'order_state.dart';
 
 class OrderBloc extends Bloc<OrderEvent, OrderState> {
-  OrderBloc() : super(OrderInitial()) {
+  final GetOrdersUseCase getOrdersUseCase;
+
+  OrderBloc(this.getOrdersUseCase) : super(OrderInitial()) {
     on<GetOrders>((event, emit) async {
       emit(OrderLoading());
       try {
-        final response = await DioHelper.getData(url: '/admin/orders');
+        final response = await getOrdersUseCase(NoParams());
         if (response.statusCode == 200) {
           final List<dynamic> data = response.data['data'];
           final orders = data.map((json) {

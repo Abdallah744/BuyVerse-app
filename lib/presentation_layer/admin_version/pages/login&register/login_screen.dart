@@ -5,6 +5,8 @@ import 'package:buy_verse_app/presentation_layer/admin_version/state_management/
 import 'package:buy_verse_app/presentation_layer/admin_version/state_management/auth/login/login_event.dart';
 import 'package:buy_verse_app/presentation_layer/admin_version/state_management/auth/login/login_state.dart';
 import 'package:buy_verse_app/presentation_layer/admin_version/state_management/category/category_bloc.dart';
+import 'package:buy_verse_app/presentation_layer/admin_version/state_management/notification/notification_bloc.dart';
+import 'package:buy_verse_app/presentation_layer/admin_version/state_management/order/order_bloc.dart';
 import 'package:buy_verse_app/presentation_layer/admin_version/state_management/product/product_bloc.dart';
 import 'package:buy_verse_app/presentation_layer/admin_version/state_management/profile/profile_bloc.dart';
 import 'package:buy_verse_app/presentation_layer/admin_version/widgets/componants.dart';
@@ -42,20 +44,26 @@ class _LoginScreenState extends State<LoginScreen> {
             state: ToastStates.SUCCESS,
           );
 
-          // Check if account is verified (using isFirstTime as proxy for verification needed)
+          // Check if account is verified specifically for this email
           bool isVerified = CacheHelper.getData(key: 'isVerified') ?? false;
+          bool isEmailVerified =
+              CacheHelper.getData(key: 'verified_${emailController.text}') ??
+              false;
 
-          if (!isVerified) {
-            // NEW FLOW: Redirect to Verification Page if not verified
+          if (!isVerified && !isEmailVerified) {
+            // NEW FLOW: Redirect to Verification Page if not verified locally
             navigateAndFinish(
               context,
               VerificationPage(email: emailController.text),
             );
           } else {
-            // Success: Go to Home
+            // Success: Trigger all data fetching for the registered account
             context.read<ProfileBloc>().add(GetProfile());
             context.read<ProductBloc>().add(GetProducts());
             context.read<CategoryBloc>().add(GetCategories());
+            context.read<OrderBloc>().add(GetOrders());
+            context.read<NotificationBloc>().add(GetNotifications());
+
             navigateAndFinish(context, const AdminHomeScreen());
           }
         }
@@ -182,9 +190,10 @@ class _LoginScreenState extends State<LoginScreen> {
                             hint: 'your@business.com',
                             label: '',
                             validate: (value) {
-                              if (value!.isEmpty)
+                              if (value!.isEmpty) {
                                 return l10n?.translate('email_required') ??
                                     'Please enter email';
+                              }
                               return null;
                             },
                           ),
@@ -219,9 +228,10 @@ class _LoginScreenState extends State<LoginScreen> {
                               });
                             },
                             validate: (value) {
-                              if (value!.isEmpty)
+                              if (value!.isEmpty) {
                                 return l10n?.translate('password_required') ??
                                     'Please enter password';
+                              }
                               return null;
                             },
                           ),

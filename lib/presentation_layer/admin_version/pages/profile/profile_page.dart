@@ -158,6 +158,34 @@ class ProfilePage extends StatelessWidget {
                 ),
               );
             }
+            if (state is ProfileError) {
+              return Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(Icons.error_outline, color: Colors.red, size: 60),
+                      const Gap(10),
+                      Text(
+                        state.message,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(fontSize: 16),
+                      ),
+                      const Gap(20),
+                      defaultButton(
+                        context: context,
+                        width: 150,
+                        function: () {
+                          context.read<ProfileBloc>().add(GetProfile());
+                        },
+                        text: 'Retry',
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }
             return const Center(child: Text('Something went wrong'));
           },
         );
