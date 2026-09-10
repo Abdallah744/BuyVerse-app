@@ -79,9 +79,8 @@ class RegisterRemoteDataSource {
   }
 
   UserModels _buildUserFromResponse(dynamic payload) {
-    final payloadMap = payload is Map<String, dynamic>
-        ? payload
-        : <String, dynamic>{};
+    final payloadMap =
+        payload is Map<String, dynamic> ? payload : <String, dynamic>{};
 
     final nestedData = payloadMap['data'] is Map<String, dynamic>
         ? payloadMap['data'] as Map<String, dynamic>
@@ -90,14 +89,19 @@ class RegisterRemoteDataSource {
         ? payloadMap['user'] as Map<String, dynamic>
         : nestedData;
 
-    final token = (payloadMap['token'] ?? payloadMap['access_token'] ?? nestedData['token'] ?? nestedData['access_token'] ?? '')
+    final token = (payloadMap['token'] ??
+            payloadMap['access_token'] ??
+            nestedData['token'] ??
+            nestedData['access_token'] ??
+            '')
         .toString();
 
     return UserModels.fromJson({
       ...userMap,
       if (token.isNotEmpty) 'token': token,
       if (payloadMap['token'] != null) 'token': payloadMap['token'],
-      if (payloadMap['access_token'] != null) 'token': payloadMap['access_token'],
+      if (payloadMap['access_token'] != null)
+        'token': payloadMap['access_token'],
     });
   }
 }

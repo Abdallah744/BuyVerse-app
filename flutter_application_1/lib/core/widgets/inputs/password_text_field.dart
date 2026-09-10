@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../../theme/app_colors.dart';
 import '../../theme/app_text_styles.dart';
 import 'app_input_decoration.dart';
 
@@ -47,9 +46,11 @@ class _PasswordTextFieldState extends State<PasswordTextField> {
             decoration: AppInputDecorations.filled(
               suffixIcon: IconButton(
                 icon: Icon(
-                  _obscure ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+                  _obscure
+                      ? Icons.visibility_off_outlined
+                      : Icons.visibility_outlined,
                   size: 18,
-                  color: AppColors.textTertiary,
+                  color: Color(0xFF99A1AF),
                 ),
                 onPressed: () => setState(() => _obscure = !_obscure),
                 tooltip: _obscure ? 'Show password' : 'Hide password',

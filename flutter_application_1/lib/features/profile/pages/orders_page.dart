@@ -61,7 +61,7 @@ class _OrdersView extends StatelessWidget {
         builder: (context, state) {
           if (state is OrderLoading) {
             return const Center(
-              child: CircularProgressIndicator(color: Color(0xFF6047FF)),
+              child: CircularProgressIndicator(color: Color(0xFFFF6900)),
             );
           }
 
@@ -92,7 +92,7 @@ class _OrdersView extends StatelessWidget {
                             token: authToken,
                           ),
                       style: FilledButton.styleFrom(
-                        backgroundColor: const Color(0xFF6047FF),
+                        backgroundColor: const Color(0xFFFF6900),
                         foregroundColor: Colors.white,
                       ),
                       child: const Text('Retry'),

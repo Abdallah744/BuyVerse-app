@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../data/remote/product_details_remote_data_source.dart';
 import '../data/repositories/product_details_repository_impl.dart';
@@ -220,11 +221,61 @@ class _ProductDetailsView extends StatelessWidget {
                     ),
                   ),
                 ),
+                const SizedBox(height: 12),
+                _FavoriteButton(productId: product.id),
               ],
             ),
           );
         },
       ),
+    );
+  }
+}
+
+class _FavoriteButton extends StatefulWidget {
+  const _FavoriteButton({required this.productId});
+
+  final int productId;
+
+  @override
+  State<_FavoriteButton> createState() => _FavoriteButtonState();
+}
+
+class _FavoriteButtonState extends State<_FavoriteButton> {
+  bool _isFavorite = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadFavorite();
+  }
+
+  Future<void> _loadFavorite() async {
+    final prefs = await SharedPreferences.getInstance();
+    final ids = prefs.getStringList('favorite_product_ids') ?? [];
+    if (mounted) {
+      setState(() => _isFavorite = ids.contains(widget.productId.toString()));
+    }
+  }
+
+  Future<void> _toggle() async {
+    final prefs = await SharedPreferences.getInstance();
+    final ids = (prefs.getStringList('favorite_product_ids') ?? []).toSet();
+    if (_isFavorite) {
+      ids.remove(widget.productId.toString());
+    } else {
+      ids.add(widget.productId.toString());
+    }
+    await prefs.setStringList('favorite_product_ids', ids.toList());
+    if (mounted) setState(() => _isFavorite = !_isFavorite);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return OutlinedButton.icon(
+      onPressed: _toggle,
+      icon: Icon(_isFavorite ? Icons.favorite : Icons.favorite_border),
+      label: Text(_isFavorite ? 'Remove from Favorites' : 'Add to Favorites'),
     );
   }
 }

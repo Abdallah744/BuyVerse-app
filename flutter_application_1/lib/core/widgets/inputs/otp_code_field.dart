@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import '../../theme/app_colors.dart';
-
 /// A row of single-digit boxes for OTP / verification code entry.
 ///
 /// Typing a digit auto-advances focus to the next box; clearing a box
@@ -65,7 +63,8 @@ class OtpCodeFieldState extends State<OtpCodeField> {
       if (value.length > 1) {
         // Handles paste-into-one-box: keep only the last typed character.
         _controllers[index].text = value.substring(value.length - 1);
-        _controllers[index].selection = const TextSelection.collapsed(offset: 1);
+        _controllers[index].selection =
+            const TextSelection.collapsed(offset: 1);
       }
       if (index < widget.length - 1) {
         _focusNodes[index + 1].requestFocus();
@@ -118,7 +117,8 @@ class _OtpDigitBox extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bool isFilled = controller.text.isNotEmpty;
-    final Color borderColor = isFilled ? AppColors.primaryGradientEnd : AppColors.inputBorder;
+    final Color borderColor =
+        isFilled ? const Color(0xFFF54900) : const Color(0xFFE5E7EB);
 
     return SizedBox(
       width: 44,
@@ -135,7 +135,7 @@ class _OtpDigitBox extends StatelessWidget {
         style: TextStyle(
           fontSize: 20,
           fontWeight: FontWeight.w700,
-          color: isFilled ? AppColors.primaryGradientEnd : AppColors.textInput,
+          color: isFilled ? const Color(0xFFF54900) : const Color(0xFF1E2939),
         ),
         decoration: InputDecoration(
           counterText: '',
@@ -152,7 +152,7 @@ class _OtpDigitBox extends StatelessWidget {
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(14),
-            borderSide: const BorderSide(color: AppColors.primaryGradientEnd, width: 2),
+            borderSide: const BorderSide(color: Color(0xFFF54900), width: 2),
           ),
         ),
       ),

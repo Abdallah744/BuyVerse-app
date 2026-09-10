@@ -19,7 +19,10 @@ class PaymentRemoteDataSource {
   }) async {
     final response = await dioClient.post(
       '$baseUrl/client/orders/pay/$orderId',
-      data: paymentData,
+      data: {
+        ...paymentData,
+        'payment_method': 'stripe',
+      },
       options: Options(
         headers: {
           if (token != null && token.isNotEmpty)

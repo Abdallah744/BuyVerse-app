@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../theme/app_colors.dart';
 
 /// Label-above-input field matching the "Field" component in Figma:
 /// bold label, then a rounded #F9FAFB input with a light border.
@@ -68,7 +67,7 @@ class _AppTextFieldState extends State<AppTextField> {
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(14),
               borderSide:
-                  const BorderSide(color: AppColors.primary, width: 1.5),
+                  const BorderSide(color: Color(0xFFFF6900), width: 1.5),
             ),
             errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(14),
@@ -81,7 +80,7 @@ class _AppTextFieldState extends State<AppTextField> {
                           ? Icons.visibility_off_outlined
                           : Icons.visibility_outlined,
                       size: 20,
-                      color: AppColors.textSecondary,
+                      color: Color(0xFF6A7282),
                     ),
                     onPressed: () => setState(() => _obscured = !_obscured),
                   )

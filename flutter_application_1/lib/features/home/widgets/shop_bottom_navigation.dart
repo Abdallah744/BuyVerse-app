@@ -1,6 +1,5 @@
+import 'package:easy_shop_profile/main.dart';
 import 'package:flutter/material.dart';
-
-import '../../../core/routes/app_routes.dart';
 
 class ShopBottomNavigation extends StatelessWidget {
   const ShopBottomNavigation({

@@ -40,11 +40,22 @@ class OrderCard extends StatelessWidget {
           children: [
             ClipRRect(
               borderRadius: BorderRadius.circular(16),
-              child: Image.network(
-                order.imageUrl,
+              child: SizedBox(
                 width: 110,
                 height: 110,
-                fit: BoxFit.cover,
+                child: Image.network(
+                  order.imageUrl,
+                  width: 110,
+                  height: 110,
+                  fit: BoxFit.cover,
+// if the photo don't come
+                  errorBuilder: (context, error, stackTrace) {
+                    return Container(
+                      color: Colors.grey.shade200,
+                      child: const Icon(Icons.broken_image, color: Colors.grey),
+                    );
+                  },
+                ),
               ),
             ),
             const SizedBox(width: 16),
@@ -66,7 +77,8 @@ class OrderCard extends StatelessWidget {
                         ),
                       ),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 6),
                         decoration: BoxDecoration(
                           color: statusColor.withValues(alpha: 0.14),
                           borderRadius: BorderRadius.circular(10),
@@ -85,25 +97,29 @@ class OrderCard extends StatelessWidget {
                   const SizedBox(height: 8),
                   Row(
                     children: [
-                      const Icon(Icons.confirmation_number_outlined, size: 16, color: Colors.grey),
+                      const Icon(Icons.confirmation_number_outlined,
+                          size: 16, color: Colors.grey),
                       const SizedBox(width: 6),
                       Text(
                         order.orderNumber,
-                        style: const TextStyle(color: Colors.grey, fontSize: 13),
+                        style:
+                            const TextStyle(color: Colors.grey, fontSize: 13),
                       ),
                     ],
                   ),
                   const SizedBox(height: 8),
                   Row(
                     children: [
-                      const Icon(Icons.location_on_outlined, size: 16, color: Colors.grey),
+                      const Icon(Icons.location_on_outlined,
+                          size: 16, color: Colors.grey),
                       const SizedBox(width: 6),
                       Expanded(
                         child: Text(
                           order.shippingAddress,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(color: Colors.grey, fontSize: 13),
+                          style:
+                              const TextStyle(color: Colors.grey, fontSize: 13),
                         ),
                       ),
                     ],

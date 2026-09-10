@@ -21,8 +21,7 @@ class ProductModel {
     final rawId = json['id'] ?? json['product_id'] ?? json['productId'] ?? 0;
     final rawName =
         json['name'] ?? json['title'] ?? json['product_name'] ?? 'Product';
-    final rawPrice =
-        json['price'] ??
+    final rawPrice = json['price'] ??
         json['amount'] ??
         json['regular_price'] ??
         json['sale_price'] ??
@@ -48,8 +47,9 @@ class ProductModel {
     return ProductModel(
       id: int.tryParse(rawId.toString()) ?? 0,
       name: rawName.toString(),
-      description: (json['description'] ?? json['details'] ?? json['short_description'])
-          ?.toString(),
+      description:
+          (json['description'] ?? json['details'] ?? json['short_description'])
+              ?.toString(),
       image: productImage?.toString(),
       price: double.tryParse(rawPrice.toString()) ?? 0,
       slug: (json['slug'] ?? json['code'])?.toString(),

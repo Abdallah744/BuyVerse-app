@@ -1,7 +1,7 @@
+import 'package:easy_shop_profile/main.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../../core/routes/app_routes.dart';
 import '../../auth/data/models/user_models.dart';
 import '../../home/widgets/shop_bottom_navigation.dart';
 import '../data/remote/profile_remote_data_source.dart';
@@ -83,10 +83,6 @@ class _ProfilePageState extends State<ProfilePage> {
                     OutlinedButton(
                       onPressed: () => setState(() {
                         _profileFuture = _loadProfile();
-                        Future<String?> _getToken() async {
-                          final prefs = await SharedPreferences.getInstance();
-                          return prefs.getString('auth_token');
-                        }
                       }),
                       child: const Text('Retry'),
                     ),
@@ -179,11 +175,15 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
+// navigate to the edit profile page
   void _openEditProfile(BuildContext context, _ProfileData profile) {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => EditProfilePage(user: profile.user),
+        builder: (_) => EditProfilePage(
+          user: profile.user,
+          authToken: profile.token,
+        ),
       ),
     );
   }
@@ -217,14 +217,6 @@ class _ProfileHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final initials = name.trim().isEmpty
-        ? 'U'
-        : name
-            .trim()
-            .split(RegExp(r'\s+'))
-            .take(2)
-            .map((part) => part[0].toUpperCase())
-            .join();
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -241,10 +233,7 @@ class _ProfileHeader extends StatelessWidget {
                 ? null
                 : NetworkImage(picture!),
             child: picture == null || picture!.isEmpty
-                ? Text(
-                    initials,
-                    style: const TextStyle(color: Colors.white, fontSize: 17),
-                  )
+                ? const Icon(Icons.person, color: Colors.white, size: 30)
                 : null,
           ),
           const SizedBox(width: 14),

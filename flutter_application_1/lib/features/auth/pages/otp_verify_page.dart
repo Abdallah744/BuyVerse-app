@@ -5,7 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../../core/params/otp_resend_params.dart';
 import '../../../core/params/otp_verify_params.dart';
 import '../../home/pages/home_page.dart';
-import '../presentation/cubit/auth_cubit.dart';
+import 'package:easy_shop_profile/features/auth/presentation/cubit/auth_cubit.dart';
 
 class OtpVerifyPage extends StatefulWidget {
   const OtpVerifyPage({super.key, this.email});
@@ -83,6 +83,11 @@ class _OtpVerifyPageState extends State<OtpVerifyPage> {
                     if (token.isNotEmpty) {
                       final prefs = await SharedPreferences.getInstance();
                       await prefs.setString('auth_token', token);
+                    }
+                    final name = state.user.name?.trim();
+                    if (name != null && name.isNotEmpty) {
+                      final prefs = await SharedPreferences.getInstance();
+                      await prefs.setString('auth_name', name);
                     }
 
                     if (!context.mounted) return;

@@ -1,7 +1,7 @@
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
 
-import '../../../../core/errors/failer_models.dart';
+import '../../../../core/models/errors/failer_models.dart';
 import '../../../../core/params/login_params.dart';
 import '../../../../core/params/otp_resend_params.dart';
 import '../../../../core/params/otp_verify_params.dart';
@@ -17,10 +17,11 @@ class UserRepoImpelement implements AuthRepo {
     RegisterRemoteDataSource? remoteDataSource,
     OtpVerifyRemoteDataSource? otpRemoteDataSource,
     OtpResendRemoteDataSource? otpResendRemoteDataSource,
-  }) : remoteDataSource = remoteDataSource ?? RegisterRemoteDataSource(),
-       otpRemoteDataSource = otpRemoteDataSource ?? OtpVerifyRemoteDataSource(),
-       otpResendRemoteDataSource =
-           otpResendRemoteDataSource ?? OtpResendRemoteDataSource();
+  })  : remoteDataSource = remoteDataSource ?? RegisterRemoteDataSource(),
+        otpRemoteDataSource =
+            otpRemoteDataSource ?? OtpVerifyRemoteDataSource(),
+        otpResendRemoteDataSource =
+            otpResendRemoteDataSource ?? OtpResendRemoteDataSource();
 
   final RegisterRemoteDataSource remoteDataSource;
   final OtpVerifyRemoteDataSource otpRemoteDataSource;

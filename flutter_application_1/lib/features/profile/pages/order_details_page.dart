@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../payment/pages/payment_page.dart';
 import '../data/remote/order_details_remote_data_source.dart';
 import '../data/repositories/order_details_repository_impl.dart';
 import '../models/order.dart';
@@ -24,15 +25,16 @@ class OrderDetailsPage extends StatelessWidget {
           OrderDetailsRemoteDataSource(authToken: authToken),
         ),
       )..fetchOrderDetails(orderId: order.id, token: authToken),
-      child: _OrderDetailsView(order: order),
+      child: _OrderDetailsView(order: order, authToken: authToken),
     );
   }
 }
 
 class _OrderDetailsView extends StatelessWidget {
-  const _OrderDetailsView({required this.order});
+  const _OrderDetailsView({required this.order, this.authToken});
 
   final OrderModel order;
+  final String? authToken;
 
   @override
   Widget build(BuildContext context) {
@@ -69,12 +71,14 @@ class _OrderDetailsView extends StatelessWidget {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(Icons.error_outline_rounded, size: 54, color: Colors.red),
+                    const Icon(Icons.error_outline_rounded,
+                        size: 54, color: Colors.red),
                     const SizedBox(height: 12),
                     Text(
                       state.message,
                       textAlign: TextAlign.center,
-                      style: const TextStyle(fontSize: 15, color: Color(0xFF1B2334)),
+                      style: const TextStyle(
+                          fontSize: 15, color: Color(0xFF1B2334)),
                     ),
                   ],
                 ),
@@ -92,12 +96,32 @@ class _OrderDetailsView extends StatelessWidget {
               children: [
                 ClipRRect(
                   borderRadius: BorderRadius.circular(24),
-                  child: Image.network(
-                    details.imageUrl,
-                    width: double.infinity,
-                    height: 240,
-                    fit: BoxFit.cover,
-                  ),
+                  child: details.imageUrl.trim().isEmpty
+                      // إذا كان الرابط فارغاً، نعرض أيقونة بديلة داخل صندوق ثابت
+                      ? Container(
+                          width: double.infinity,
+                          height: 240,
+                          color: Colors.grey.shade200,
+                          child: const Icon(Icons.image_not_supported,
+                              size: 50, color: Colors.grey),
+                        )
+                      // إذا كان هناك رابط، نحاول تحميله مع إضافة errorBuilder
+                      : Image.network(
+                          details.imageUrl,
+                          width: double.infinity,
+                          height: 240,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            // إذا فشل تحميل الرابط (مثلاً خطأ 404 أو انقطاع نت)
+                            return Container(
+                              width: double.infinity,
+                              height: 240,
+                              color: Colors.grey.shade200,
+                              child: const Icon(Icons.broken_image,
+                                  size: 50, color: Colors.grey),
+                            );
+                          },
+                        ),
                 ),
                 const SizedBox(height: 20),
                 Row(
@@ -114,7 +138,8 @@ class _OrderDetailsView extends StatelessWidget {
                       ),
                     ),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 8),
                       decoration: BoxDecoration(
                         color: statusColor.withValues(alpha: 0.14),
                         borderRadius: BorderRadius.circular(12),
@@ -128,6 +153,30 @@ class _OrderDetailsView extends StatelessWidget {
                         ),
                       ),
                     ),
+                    if (!details.status.toLowerCase().contains('paid') &&
+                        !details.status.toLowerCase().contains('delivered'))
+                      Padding(
+                        padding: const EdgeInsets.only(top: 18),
+                        child: SizedBox(
+                          width: double.infinity,
+                          child: FilledButton.icon(
+                            onPressed: () => Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => PaymentPage(
+                                  orderId: details.id,
+                                  authToken: authToken,
+                                  defaultPaymentData: const {
+                                    'payment_method': 'stripe',
+                                  },
+                                ),
+                              ),
+                            ),
+                            icon: const Icon(Icons.credit_card),
+                            label: const Text('Pay with Stripe'),
+                          ),
+                        ),
+                      ),
                   ],
                 ),
                 const SizedBox(height: 18),
@@ -137,7 +186,8 @@ class _OrderDetailsView extends StatelessWidget {
                     const SizedBox(width: 8),
                     const Text(
                       'Total:',
-                      style: TextStyle(color: Colors.grey, fontWeight: FontWeight.w600),
+                      style: TextStyle(
+                          color: Colors.grey, fontWeight: FontWeight.w600),
                     ),
                     const SizedBox(width: 8),
                     Text(
@@ -166,13 +216,18 @@ class _OrderDetailsView extends StatelessWidget {
                   ),
                   child: Column(
                     children: [
-                      _DetailRow(label: 'Order number', value: details.orderNumber),
+                      _DetailRow(
+                          label: 'Order number', value: details.orderNumber),
                       const Divider(height: 22),
-                      _DetailRow(label: 'Items', value: '${details.itemCount} item${details.itemCount > 1 ? 's' : ''}'),
+                      _DetailRow(
+                          label: 'Items',
+                          value:
+                              '${details.itemCount} item${details.itemCount > 1 ? 's' : ''}'),
                       const Divider(height: 22),
                       _DetailRow(label: 'Created', value: details.createdAt),
                       const Divider(height: 22),
-                      _DetailRow(label: 'Shipping', value: details.shippingAddress),
+                      _DetailRow(
+                          label: 'Shipping', value: details.shippingAddress),
                     ],
                   ),
                 ),

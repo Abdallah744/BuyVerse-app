@@ -44,16 +44,15 @@ class OtpVerifyRemoteDataSource {
     final userMap = payloadMap['user'] is Map<String, dynamic>
         ? payloadMap['user'] as Map<String, dynamic>
         : payloadMap['data'] is Map<String, dynamic>
-        ? payloadMap['data'] as Map<String, dynamic>
-        : payloadMap;
+            ? payloadMap['data'] as Map<String, dynamic>
+            : payloadMap;
 
-    final token =
-        (payloadMap['token'] ??
-                payloadMap['access_token'] ??
-                userMap['token'] ??
-                userMap['access_token'] ??
-                '')
-            .toString();
+    final token = (payloadMap['token'] ??
+            payloadMap['access_token'] ??
+            userMap['token'] ??
+            userMap['access_token'] ??
+            '')
+        .toString();
 
     return UserModels.fromJson({
       ...userMap,

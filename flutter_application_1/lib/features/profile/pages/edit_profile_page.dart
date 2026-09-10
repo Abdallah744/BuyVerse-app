@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
+import 'dart:io';
+import 'package:image_picker/image_picker.dart';
 
 import '../../auth/data/models/user_models.dart';
+import '../data/remote/profile_remote_data_source.dart';
 
 class EditProfilePage extends StatefulWidget {
-  const EditProfilePage({super.key, this.user});
+  const EditProfilePage({super.key, this.user, this.authToken});
 
   final UserModels? user;
+  final String? authToken;
 
   @override
   State<EditProfilePage> createState() => _EditProfilePageState();
@@ -16,6 +20,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
   late final TextEditingController _emailController;
   late final TextEditingController _phoneController;
   late final TextEditingController _addressController;
+  File? _picture;
+  bool _saving = false;
 
   @override
   void initState() {
@@ -52,14 +58,20 @@ class _EditProfilePageState extends State<EditProfilePage> {
       body: ListView(
         padding: const EdgeInsets.fromLTRB(18, 20, 18, 28),
         children: [
-          const Center(
-            child: CircleAvatar(
-              radius: 34,
-              backgroundColor: Color(0xFFFF6900),
-              child: Text('AH',
-                  style: TextStyle(color: Colors.white, fontSize: 20)),
+          Center(
+            child: GestureDetector(
+              onTap: _pickPicture,
+              child: CircleAvatar(
+                radius: 34,
+                backgroundColor: const Color(0xFFFF6900),
+                backgroundImage: _picture == null ? null : FileImage(_picture!),
+                child: _picture == null
+                    ? const Icon(Icons.person, color: Colors.white, size: 30)
+                    : null,
+              ),
             ),
           ),
+          const Center(child: Text('Tap the icon to choose a profile photo')),
           const SizedBox(height: 28),
           _field('Full Name', _nameController),
           _field('Email', _emailController,
@@ -86,9 +98,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
             ),
           ),
           FilledButton(
-            onPressed: () => ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Profile saved successfully!')),
-            ),
+            onPressed: _saving ? null : _save,
             style: FilledButton.styleFrom(
               backgroundColor: const Color(0xFFFF6900),
               minimumSize: const Size.fromHeight(52),
@@ -96,11 +106,45 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 borderRadius: BorderRadius.circular(11),
               ),
             ),
-            child: const Text('Save Changes'),
+            child: Text(_saving ? 'Saving...' : 'Save Changes'),
           ),
         ],
       ),
     );
+  }
+
+  Future<void> _pickPicture() async {
+    final picked = await ImagePicker().pickImage(source: ImageSource.gallery);
+    if (picked != null && mounted) {
+      setState(() => _picture = File(picked.path));
+    }
+  }
+
+  Future<void> _save() async {
+    final token = widget.authToken;
+    if (token == null || token.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please login again to update profile')),
+      );
+      return;
+    }
+    setState(() => _saving = true);
+    try {
+      await ProfileRemoteDataSource().updateProfile(
+        token: token,
+        name: _nameController.text.trim(),
+        email: _emailController.text.trim(),
+        phone: _phoneController.text.trim(),
+        picture: _picture,
+      );
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Profile saved successfully!')),
+      );
+      Navigator.pop(context);
+    } finally {
+      if (mounted) setState(() => _saving = false);
+    }
   }
 
   Widget _field(

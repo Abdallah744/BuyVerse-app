@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../core/network/api_config.dart';
 import '../../models/order.dart';
@@ -16,10 +17,12 @@ class OrderRemoteDataSource {
 
   Future<List<OrderModel>> getOrders({String? token}) async {
     final bearerToken = token ?? authToken;
+    final prefs = await SharedPreferences.getInstance();
     final response = await dioClient.get(
       '$baseUrl/client/orders',
       options: Options(
         headers: {
+          'Accept': 'application/json',
           if (bearerToken != null && bearerToken.isNotEmpty)
             'Authorization': ApiConfig.authorizationHeader(bearerToken),
         },

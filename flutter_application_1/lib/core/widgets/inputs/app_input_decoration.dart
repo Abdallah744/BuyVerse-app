@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../../theme/app_colors.dart';
-
 /// Builds the rounded, filled [InputDecoration] used by every text field
 /// in the app. Centralizing it here means [LabeledTextField] and
 /// [PasswordTextField] (and any future field) stay pixel-identical
@@ -13,31 +11,31 @@ abstract final class AppInputDecorations {
   }) {
     return InputDecoration(
       filled: true,
-      fillColor: AppColors.inputBackground,
+      fillColor: const Color(0xFFF9FAFB),
       prefixIcon: prefixIcon == null
           ? null
-          : Icon(prefixIcon, size: 18, color: AppColors.textTertiary),
+          : Icon(prefixIcon, size: 18, color: Color(0xFF99A1AF)),
       suffixIcon: suffixIcon,
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(14),
-        borderSide: const BorderSide(color: AppColors.inputBorder),
+        borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(14),
-        borderSide: const BorderSide(color: AppColors.inputBorder),
+        borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(14),
-        borderSide: const BorderSide(color: AppColors.primary, width: 1.4),
+        borderSide: const BorderSide(color: Color(0xFFFF6900), width: 1.4),
       ),
       errorBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(14),
-        borderSide: const BorderSide(color: AppColors.danger),
+        borderSide: const BorderSide(color: Color(0xFFFB2C36)),
       ),
       focusedErrorBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(14),
-        borderSide: const BorderSide(color: AppColors.danger, width: 1.4),
+        borderSide: const BorderSide(color: Color(0xFFFB2C36), width: 1.4),
       ),
     );
   }

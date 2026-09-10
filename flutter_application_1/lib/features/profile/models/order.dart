@@ -27,19 +27,38 @@ class OrderModel {
         : json;
 
     final orderId = data['id'] ?? data['order_id'] ?? 0;
-    final number = (data['order_number'] ?? data['number'] ?? data['orderNo'] ?? '#$orderId')
+    final number = (data['order_number'] ??
+            data['number'] ??
+            data['orderNo'] ??
+            '#$orderId')
         .toString();
     final status = (data['status'] ?? 'pending').toString();
-    final amount = (data['total_amount'] ?? data['total'] ?? data['amount'] ?? '0.00').toString();
-    final createdAt = (data['created_at'] ?? data['createdAt'] ?? DateTime.now().toIso8601String())
+    final amount =
+        (data['total_amount'] ?? data['total'] ?? data['amount'] ?? '0.00')
+            .toString();
+    final createdAt = (data['created_at'] ??
+            data['createdAt'] ??
+            DateTime.now().toIso8601String())
         .toString();
-    final productName = (data['product_name'] ?? data['productName'] ?? data['title'] ?? 'Product')
+    final productName = (data['product_name'] ??
+            data['productName'] ??
+            data['title'] ??
+            'Product')
         .toString();
-    final imageUrl = (data['image_url'] ?? data['imageUrl'] ?? data['image'] ??
+    final imageUrl = (data['image_url'] ??
+            data['imageUrl'] ??
+            data['image'] ??
             'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=800&q=80')
         .toString();
-    final itemCount = int.tryParse((data['item_count'] ?? data['items_count'] ?? data['quantity'] ?? '1').toString()) ?? 1;
-    final shippingAddress = (data['shipping_address'] ?? data['address'] ?? 'Not available').toString();
+    final itemCount = int.tryParse((data['item_count'] ??
+                data['items_count'] ??
+                data['quantity'] ??
+                '1')
+            .toString()) ??
+        1;
+    final shippingAddress =
+        (data['shipping_address'] ?? data['address'] ?? 'Not available')
+            .toString();
 
     return OrderModel(
       id: int.tryParse(orderId.toString()) ?? 0,
@@ -96,7 +115,8 @@ class OrderModel {
         totalAmount: '\$249.00',
         createdAt: '2026-09-01',
         productName: 'Smart Watch Pro',
-        imageUrl: 'https://images.unsplash.com/photo-1546868871-7041f2a55e12?auto=format&fit=crop&w=800&q=80',
+        imageUrl:
+            'https://images.unsplash.com/photo-1546868871-7041f2a55e12?auto=format&fit=crop&w=800&q=80',
         itemCount: 1,
         shippingAddress: 'Cairo, Egypt',
       ),
@@ -107,7 +127,8 @@ class OrderModel {
         totalAmount: '\$159.00',
         createdAt: '2026-09-04',
         productName: 'Wireless Earbuds',
-        imageUrl: 'https://images.unsplash.com/photo-1546435770-a3e426bf472b?auto=format&fit=crop&w=800&q=80',
+        imageUrl:
+            'https://images.unsplash.com/photo-1546435770-a3e426bf472b?auto=format&fit=crop&w=800&q=80',
         itemCount: 2,
         shippingAddress: 'Alexandria, Egypt',
       ),

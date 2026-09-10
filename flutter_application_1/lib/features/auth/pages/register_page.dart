@@ -4,7 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../core/params/register_param.dart';
 import '../../home/pages/home_page.dart';
-import '../presentation/cubit/auth_cubit.dart';
+import 'package:easy_shop_profile/features/auth/presentation/cubit/auth_cubit.dart';
 import 'otp_verify_page.dart';
 
 class RegisterPage extends StatefulWidget {
@@ -61,6 +61,11 @@ class _RegisterPageState extends State<RegisterPage> {
                   if (token.isNotEmpty) {
                     final prefs = await SharedPreferences.getInstance();
                     await prefs.setString('auth_token', token);
+                  }
+                  final name = (state.user.name ?? _nameController.text).trim();
+                  if (name.isNotEmpty) {
+                    final prefs = await SharedPreferences.getInstance();
+                    await prefs.setString('auth_name', name);
                   }
 
                   if (!context.mounted) return;

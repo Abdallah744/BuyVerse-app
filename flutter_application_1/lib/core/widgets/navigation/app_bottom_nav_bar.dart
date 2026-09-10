@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../../theme/app_colors.dart';
 import '../../theme/app_text_styles.dart';
 import 'app_tab.dart';
 
@@ -29,8 +28,8 @@ class AppBottomNavBar extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 4),
       decoration: const BoxDecoration(
-        color: AppColors.surface,
-        border: Border(top: BorderSide(color: AppColors.surfaceBorder)),
+        color: Colors.white,
+        border: Border(top: BorderSide(color: Color(0xFFF3F4F6))),
       ),
       child: SafeArea(
         top: false,
@@ -67,7 +66,8 @@ class _NavItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Color color = isActive ? AppColors.primary : AppColors.textTertiary;
+    final Color color =
+        isActive ? const Color(0xFFFF6900) : const Color(0xFF99A1AF);
 
     return InkWell(
       onTap: onTap,
@@ -87,14 +87,15 @@ class _NavItem extends StatelessWidget {
                       width: 32,
                       height: 2,
                       decoration: const BoxDecoration(
-                        color: AppColors.primary,
+                        color: Color(0xFFFF6900),
                         borderRadius: BorderRadius.vertical(
                           bottom: Radius.circular(999),
                         ),
                       ),
                     ),
                   ),
-                Icon(isActive ? tab.activeIcon : tab.icon, size: 21, color: color),
+                Icon(isActive ? tab.activeIcon : tab.icon,
+                    size: 21, color: color),
                 if (badgeCount > 0)
                   Positioned(
                     top: -8,
@@ -105,7 +106,7 @@ class _NavItem extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(horizontal: 2),
                       alignment: Alignment.center,
                       decoration: const BoxDecoration(
-                        color: AppColors.danger,
+                        color: Color(0xFFFB2C36),
                         shape: BoxShape.circle,
                       ),
                       child: Text(
@@ -124,7 +125,9 @@ class _NavItem extends StatelessWidget {
             const SizedBox(height: 2),
             Text(
               tab.label,
-              style: isActive ? AppTextStyles.navLabelActive : AppTextStyles.navLabel,
+              style: isActive
+                  ? AppTextStyles.navLabelActive
+                  : AppTextStyles.navLabel,
             ),
           ],
         ),

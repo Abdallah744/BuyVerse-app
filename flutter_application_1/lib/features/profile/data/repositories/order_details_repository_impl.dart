@@ -12,9 +12,11 @@ class OrderDetailsRepositoryImpl implements OrderRepository {
     return const [];
   }
 
-  Future<OrderModel> getOrderDetails({required int orderId, String? token}) async {
+  Future<OrderModel> getOrderDetails(
+      {required int orderId, String? token}) async {
     try {
-      return await remoteDataSource.getOrderDetails(orderId: orderId, token: token);
+      return await remoteDataSource.getOrderDetails(
+          orderId: orderId, token: token);
     } catch (_) {
       return OrderModel.mockOrders().first;
     }

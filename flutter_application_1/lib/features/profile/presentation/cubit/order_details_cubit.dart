@@ -30,7 +30,8 @@ class OrderDetailsCubit extends Cubit<OrderDetailsState> {
     emit(OrderDetailsLoading());
 
     try {
-      final order = await repository.getOrderDetails(orderId: orderId, token: token);
+      final order =
+          await repository.getOrderDetails(orderId: orderId, token: token);
       emit(OrderDetailsLoaded(order));
     } catch (error) {
       emit(OrderDetailsError(error.toString()));

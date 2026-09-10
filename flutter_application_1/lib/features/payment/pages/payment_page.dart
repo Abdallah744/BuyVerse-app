@@ -20,7 +20,8 @@ class PaymentPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => PaymentCubit(PaymentRepositoryImpl(PaymentRemoteDataSource())),
+      create: (_) =>
+          PaymentCubit(PaymentRepositoryImpl(PaymentRemoteDataSource())),
       child: _PaymentView(
         orderId: orderId,
         authToken: authToken,
@@ -47,7 +48,7 @@ class _PaymentView extends StatefulWidget {
 
 class _PaymentViewState extends State<_PaymentView> {
   final TextEditingController methodController =
-      TextEditingController(text: 'cash');
+      TextEditingController(text: 'stripe');
   final TextEditingController detailsController =
       TextEditingController(text: '');
 
@@ -113,9 +114,11 @@ class _PaymentViewState extends State<_PaymentView> {
                 const SizedBox(height: 16),
                 TextFormField(
                   controller: methodController,
+                  readOnly: true,
                   decoration: const InputDecoration(
-                    labelText: 'Method',
-                    hintText: 'cash / visa / wallet',
+                    labelText: 'Payment method',
+                    hintText: 'Stripe',
+                    prefixIcon: Icon(Icons.credit_card),
                     border: OutlineInputBorder(),
                   ),
                 ),
@@ -135,18 +138,17 @@ class _PaymentViewState extends State<_PaymentView> {
                     onPressed: isProcessing
                         ? null
                         : () {
-                            final method = methodController.text.trim();
                             final data = {
                               ...widget.defaultPaymentData,
-                              'payment_method': method.isEmpty ? 'cash' : method,
+                              'payment_method': 'stripe',
                               'details': detailsController.text.trim(),
                             };
 
                             context.read<PaymentCubit>().payOrder(
-                              orderId: widget.orderId,
-                              paymentData: data,
-                              token: widget.authToken,
-                            );
+                                  orderId: widget.orderId,
+                                  paymentData: data,
+                                  token: widget.authToken,
+                                );
                           },
                     icon: isProcessing
                         ? const SizedBox(

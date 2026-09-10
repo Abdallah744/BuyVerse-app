@@ -1,5 +1,5 @@
 import 'package:dartz/dartz.dart';
-import 'package:easy_shop_profile/core/errors/failer_models.dart';
+import 'package:easy_shop_profile/core/models/errors/failer_models.dart';
 import 'package:easy_shop_profile/core/params/login_params.dart';
 import 'package:easy_shop_profile/core/params/otp_resend_params.dart';
 import 'package:easy_shop_profile/core/params/otp_verify_params.dart';

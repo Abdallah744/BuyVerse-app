@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../../theme/app_colors.dart';
 import '../../theme/app_text_styles.dart';
 
 /// The solid orange, fully-rounded CTA button used across the flow
@@ -27,7 +26,7 @@ class PrimaryButton extends StatelessWidget {
     return SizedBox(
       width: double.infinity,
       child: Material(
-        color: disabled ? AppColors.primaryDisabled : AppColors.primary,
+        color: disabled ? const Color(0x99FF6900) : const Color(0xFFFF6900),
         borderRadius: BorderRadius.circular(16),
         child: InkWell(
           borderRadius: BorderRadius.circular(16),

@@ -33,7 +33,8 @@ class ProductDetailsCubit extends Cubit<ProductDetailsState> {
     emit(ProductDetailsLoading());
 
     try {
-      final product = await repository.getProductBySlug(slug: slug, token: token);
+      final product =
+          await repository.getProductBySlug(slug: slug, token: token);
       emit(ProductDetailsLoaded(product));
     } catch (error) {
       emit(ProductDetailsError(error.toString()));
