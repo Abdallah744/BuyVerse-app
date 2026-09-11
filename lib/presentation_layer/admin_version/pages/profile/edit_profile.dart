@@ -249,9 +249,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
           controller: nameController,
           type: TextInputType.name,
           validate: (value) {
-            if (value!.isEmpty)
+            if (value!.isEmpty) {
               return l10n?.translate('name_required') ??
                   'Name must not be empty';
+            }
             return null;
           },
           label: '',
@@ -264,9 +265,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
           controller: emailController,
           type: TextInputType.emailAddress,
           validate: (value) {
-            if (value!.isEmpty)
+            if (value!.isEmpty) {
               return l10n?.translate('email_required') ??
                   'Email must not be empty';
+            }
             return null;
           },
           label: '',
@@ -279,9 +281,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
           controller: phoneController,
           type: TextInputType.phone,
           validate: (value) {
-            if (value!.isEmpty)
+            if (value!.isEmpty) {
               return l10n?.translate('phone_required') ??
                   'Phone must not be empty';
+            }
             return null;
           },
           label: '',
@@ -297,8 +300,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
           controller: idController,
           type: TextInputType.number,
           validate: (value) {
-            if (value!.isEmpty)
+            if (value!.isEmpty) {
               return l10n?.translate('id_required') ?? 'ID must not be empty';
+            }
             return null;
           },
           label: '',
@@ -314,9 +318,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
           controller: businessNameController,
           type: TextInputType.text,
           validate: (value) {
-            if (value!.isEmpty)
+            if (value!.isEmpty) {
               return l10n?.translate('business_name_required') ??
                   'Business name must not be empty';
+            }
             return null;
           },
           label: '',

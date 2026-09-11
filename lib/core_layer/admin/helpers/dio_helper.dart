@@ -10,7 +10,7 @@ class DioHelper {
   static late Dio dio;
   static String? token;
 
-  static init() async {
+  static Future<void> init() async {
     token = CacheHelper.getData(key: 'token');
 
     final dir = await getTemporaryDirectory();

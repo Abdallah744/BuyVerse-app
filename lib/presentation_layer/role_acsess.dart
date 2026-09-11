@@ -1,6 +1,7 @@
 import 'package:buy_verse_app/core_layer/admin/helpers/cache_helper.dart';
 import 'package:buy_verse_app/presentation_layer/admin_version/pages/login&register/login_screen.dart';
 import 'package:buy_verse_app/presentation_layer/admin_version/widgets/componants.dart';
+import 'package:buy_verse_app/presentation_layer/user_version/pages/login_page.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:hexcolor/hexcolor.dart';
@@ -67,11 +68,7 @@ class _RoleAccessRestrictionState extends State<RoleAccessRestriction> {
                     navigateTo(context, const LoginScreen());
                   } else if (selectedRole == 'Customer') {
                     CacheHelper.saveData(key: 'role', value: 'customer');
-                    showToast(
-                      context: context,
-                      text: 'Customer interface is under development',
-                      state: ToastStates.WARNING,
-                    );
+                    navigateTo(context, const LoginPage());
                   }
                 },
                 text: 'Continue',

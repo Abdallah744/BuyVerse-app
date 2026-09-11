@@ -29,11 +29,11 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
-import 'core_layer/admin/helpers/app_localization.dart';
-import 'core_layer/admin/helpers/app_theme.dart';
-import 'core_layer/admin/helpers/cache_helper.dart';
-import 'core_layer/admin/helpers/dio_helper.dart';
-import 'core_layer/admin/helpers/notification_helper.dart';
+import 'package:buy_verse_app/core_layer/admin/helpers/app_localization.dart';
+import 'package:buy_verse_app/core_layer/admin/helpers/app_theme.dart';
+import 'package:buy_verse_app/core_layer/admin/helpers/cache_helper.dart';
+import 'package:buy_verse_app/core_layer/admin/helpers/dio_helper.dart';
+import 'package:buy_verse_app/core_layer/admin/helpers/notification_helper.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
