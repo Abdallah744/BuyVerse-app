@@ -3,7 +3,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../data_layer/user/logout_repository_impl.dart';
 import '../../../data_layer/user/remote_data/auth/logout_remote_data_source.dart';
-import '../pages/login_page.dart';
+import '../../../data_layer/user/services/shared_preferences_service.dart';
+import '../../role_acsess.dart';
 
 Future<void> showLogoutConfirmDialog(
   BuildContext context, {
@@ -53,11 +54,12 @@ Future<void> showLogoutConfirmDialog(
     }
   }
 
-  await prefs.remove('auth_token');
+  // Clear all auth data
+  await SharedPreferencesService.instance.clearAuthData();
 
   if (context.mounted) {
     Navigator.of(context).pushAndRemoveUntil(
-      MaterialPageRoute(builder: (_) => const LoginPage()),
+      MaterialPageRoute(builder: (_) => const RoleAccessRestriction()),
       (route) => false,
     );
   }

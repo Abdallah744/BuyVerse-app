@@ -81,8 +81,8 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
       emit(ProfileLoading());
       try {
         // Extract lat/lng from storeLocation if available
-        String lat = '30.0';
-        String lng = '31.0';
+        String? lat;
+        String? lng;
         if (event.profile.storeLocation.contains(',')) {
           final parts = event.profile.storeLocation.split(',');
           if (parts.length >= 2) {
@@ -98,8 +98,8 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
           'national_id': event.profile.nationalId,
           'business_name': event.profile.businessName,
           'address': event.profile.businessAddress,
-          'latitude': lat,
-          'longitude': lng,
+          if (lat != null) 'latitude': lat,
+          if (lng != null) 'longitude': lng,
         });
 
         if (event.profileImagePath != null) {
@@ -138,10 +138,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
             formData.files.add(
               MapEntry(
                 'tax_card',
-                await MultipartFile.fromFile(
-                  taxCardPath,
-                  filename: 'tax.pdf',
-                ),
+                await MultipartFile.fromFile(taxCardPath, filename: 'tax.pdf'),
               ),
             );
           }

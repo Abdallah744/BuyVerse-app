@@ -225,6 +225,8 @@ class _ProductsShowPageState extends State<ProductsShowPage> {
                 children: [
                   Text(
                     product.name,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: context.setSp(16),
@@ -232,6 +234,8 @@ class _ProductsShowPageState extends State<ProductsShowPage> {
                   ),
                   Text(
                     product.category,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       color: Colors.grey[500],
                       fontSize: context.setSp(14),
@@ -240,20 +244,28 @@ class _ProductsShowPageState extends State<ProductsShowPage> {
                   Gap(context.setHeight(4)),
                   Row(
                     children: [
-                      Text(
-                        '${product.price} EGP',
-                        style: TextStyle(
-                          color: HexColor('F5821F'),
-                          fontWeight: FontWeight.bold,
-                          fontSize: context.setSp(16),
+                      Flexible(
+                        child: Text(
+                          '${product.price} EGP',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: HexColor('F5821F'),
+                            fontWeight: FontWeight.bold,
+                            fontSize: context.setSp(16),
+                          ),
                         ),
                       ),
                       Gap(context.setWidth(10)),
-                      Text(
-                        '${l10n?.translate('quantity') ?? 'Qty'} ${product.quantity}',
-                        style: TextStyle(
-                          color: Colors.grey[500],
-                          fontSize: context.setSp(14),
+                      Flexible(
+                        child: Text(
+                          '${l10n?.translate('quantity') ?? 'Qty'} ${product.quantity}',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: Colors.grey[500],
+                            fontSize: context.setSp(14),
+                          ),
                         ),
                       ),
                     ],

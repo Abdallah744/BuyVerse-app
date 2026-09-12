@@ -1,12 +1,10 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-import '../../../../domain_layer/user/repositories/products/cart_repository_impl.dart';
-import '../../../../data_layer/user/user_models/cart_model.dart';
+import 'package:buy_verse_app/domain_layer/user/repositories/products/cart_repository.dart';
+import 'package:buy_verse_app/data_layer/user/user_models/cart_model.dart';
 
 abstract class CartState {}
 
-// the all states
 class CartInitial extends CartState {}
 
 class CartLoading extends CartState {}
@@ -23,41 +21,32 @@ class CartError extends CartState {
   final String message;
 }
 
-// ***************************************************
 class CartCubit extends Cubit<CartState> {
   CartCubit(this.repository) : super(CartInitial());
 
-  final CartRepositoryImpl repository;
+  final CartRepository repository;
 
-  // we have a unique token that's the way to talk with the api , and we get and save it here
   Future<String?> _getToken() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString('auth_token');
   }
 
   Future<void> fetchCart({String? token}) async {
-    // first thing we loading  te cart
     emit(CartLoading());
 
     try {
       final activeToken = token ?? await _getToken();
-      // geeting the token
       final items = await repository.getCart(token: activeToken);
-      // the codition of the state
       if (items.isEmpty) {
         emit(CartEmpty());
       } else {
         emit(CartLoaded(items));
       }
-
-      // in error case in getin the token
     } catch (error) {
       emit(CartError(error.toString()));
     }
   }
 
-  // adding to cart function
-  //************************************************************* */
   Future<void> addToCart({
     required int productId,
     int quantity = 1,
@@ -70,19 +59,19 @@ class CartCubit extends Cubit<CartState> {
         quantity: quantity,
         token: activeToken,
       );
-      // await fetchCart(token: activeToken);
+      // Refresh cart after adding
+      await fetchCart(token: activeToken);
     } catch (error) {
       emit(CartError(error.toString()));
     }
   }
 
-  // removing  function
-  //******************************************************* */
   Future<void> removeFromCart({required int productId, String? token}) async {
     try {
       final activeToken = token ?? await _getToken();
       await repository.removeFromCart(productId: productId, token: activeToken);
-      // await fetchCart(token: activeToken);
+      // Refresh cart after removing
+      await fetchCart(token: activeToken);
     } catch (error) {
       emit(CartError(error.toString()));
     }
@@ -100,7 +89,8 @@ class CartCubit extends Cubit<CartState> {
         quantity: quantity,
         token: activeToken,
       );
-      // await fetchCart(token: activeToken);
+      // Refresh cart after updating
+      await fetchCart(token: activeToken);
     } catch (error) {
       emit(CartError(error.toString()));
     }

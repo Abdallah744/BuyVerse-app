@@ -65,17 +65,36 @@ class ManageCategoryPage extends StatelessWidget {
           ),
         ],
       ),
-      body: BlocBuilder<CategoryBloc, CategoryState>(
+      body: BlocConsumer<CategoryBloc, CategoryState>(
+        listener: (context, state) {
+          if (state is CategorySuccess) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(state.message),
+                backgroundColor: Colors.green,
+              ),
+            );
+          } else if (state is CategoryError) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(state.message),
+                backgroundColor: Colors.red,
+              ),
+            );
+          }
+        },
         builder: (context, state) {
           if (state is CategoryLoading) {
             return const Center(child: CircularProgressIndicator());
           } else if (state is CategoryLoaded) {
+            final categories = state.categories;
+
             return SingleChildScrollView(
               child: Padding(
                 padding: EdgeInsets.all(context.setWidth(20.0)),
                 child: Column(
                   children: [
-                    if (state.categories.isEmpty)
+                    if (categories.isEmpty)
                       Center(
                         child: Text(
                           l10n?.translate('no_data') ?? 'No categories found',
@@ -85,13 +104,11 @@ class ManageCategoryPage extends StatelessWidget {
                       ListView.separated(
                         shrinkWrap: true,
                         physics: const NeverScrollableScrollPhysics(),
-                        itemBuilder: (context, index) => _buildCategoryItem(
-                          context,
-                          state.categories[index],
-                        ),
+                        itemBuilder: (context, index) =>
+                            _buildCategoryItem(context, categories[index]),
                         separatorBuilder: (context, index) =>
                             Gap(context.setHeight(15)),
-                        itemCount: state.categories.length,
+                        itemCount: categories.length,
                       ),
                   ],
                 ),
@@ -154,7 +171,45 @@ class ManageCategoryPage extends StatelessWidget {
           ),
           IconButton(
             onPressed: () {
-              context.read<CategoryBloc>().add(DeleteCategory(category.id));
+              showDialog(
+                context: context,
+                builder: (dialogContext) => AlertDialog(
+                  title: Text(
+                    AppLocalizations.of(
+                          context,
+                        )?.translate('delete_category') ??
+                        'Delete Category',
+                  ),
+                  content: Text(
+                    AppLocalizations.of(
+                          context,
+                        )?.translate('confirm_delete_category') ??
+                        'Are you sure you want to delete this category?',
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(dialogContext),
+                      child: Text(
+                        AppLocalizations.of(context)?.translate('cancel') ??
+                            'Cancel',
+                      ),
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        context.read<CategoryBloc>().add(
+                          DeleteCategory(category.slug),
+                        );
+                        Navigator.pop(dialogContext);
+                      },
+                      child: Text(
+                        AppLocalizations.of(context)?.translate('delete') ??
+                            'Delete',
+                        style: const TextStyle(color: Colors.red),
+                      ),
+                    ),
+                  ],
+                ),
+              );
             },
             icon: const Icon(Icons.delete_outline, color: Colors.red),
           ),

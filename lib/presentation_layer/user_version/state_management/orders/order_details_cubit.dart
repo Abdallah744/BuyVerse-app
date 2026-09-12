@@ -1,7 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-
-import '../../../../domain_layer/user/repositories/orders/order_details_repository_impl.dart';
-import '../../../../data_layer/user/user_models/order.dart';
+import 'package:buy_verse_app/domain_layer/user/repositories/orders/order_details_repository.dart';
+import 'package:buy_verse_app/data_layer/user/user_models/order.dart';
 
 abstract class OrderDetailsState {}
 
@@ -24,7 +23,7 @@ class OrderDetailsError extends OrderDetailsState {
 class OrderDetailsCubit extends Cubit<OrderDetailsState> {
   OrderDetailsCubit(this.repository) : super(OrderDetailsInitial());
 
-  final OrderDetailsRepositoryImpl repository;
+  final OrderDetailsRepository repository;
 
   Future<void> fetchOrderDetails({required int orderId, String? token}) async {
     emit(OrderDetailsLoading());

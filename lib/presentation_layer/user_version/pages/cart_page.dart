@@ -4,6 +4,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../data_layer/user/remote_data/cart_remote_data_source.dart';
 import '../../../domain_layer/user/repositories/products/cart_repository_impl.dart';
 import '../state_management/proudcts/cart_cubit.dart';
+import '../widgets/shop_bottom_navigation.dart';
+import 'payment/checkout_page.dart';
 
 class CartPage extends StatelessWidget {
   const CartPage({super.key, this.authToken});
@@ -33,6 +35,7 @@ class _CartView extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
+        automaticallyImplyLeading: false,
         title: const Text(
           'Cart',
           style: TextStyle(
@@ -255,23 +258,58 @@ class _CartView extends StatelessWidget {
                       top: Radius.circular(22),
                     ),
                   ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  child: Column(
                     children: [
-                      const Text(
-                        'Total',
-                        style: TextStyle(
-                          color: Color(0xFF1B2334),
-                          fontSize: 18,
-                          fontWeight: FontWeight.w700,
-                        ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            'Total',
+                            style: TextStyle(
+                              color: Color(0xFF1B2334),
+                              fontSize: 18,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          Text(
+                            '\$${total.toStringAsFixed(2)}',
+                            style: const TextStyle(
+                              color: Color(0xFF6047FF),
+                              fontSize: 22,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                        ],
                       ),
-                      Text(
-                        '\$${total.toStringAsFixed(2)}',
-                        style: const TextStyle(
-                          color: Color(0xFF6047FF),
-                          fontSize: 22,
-                          fontWeight: FontWeight.w800,
+                      const SizedBox(height: 16),
+                      SizedBox(
+                        width: double.infinity,
+                        child: FilledButton.icon(
+                          onPressed: () {
+                            if (items.isNotEmpty) {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => CheckoutPage(
+                                    authToken: authToken,
+                                    productIds: items.map((item) => item.productId).toList(),
+                                    quantities: items.map((item) => item.quantity).toList(),
+                                    prices: items.map((item) => item.price).toList(),
+                                  ),
+                                ),
+                              );
+                            }
+                          },
+                          icon: const Icon(Icons.shopping_bag_outlined),
+                          label: const Text('Proceed to Checkout'),
+                          style: FilledButton.styleFrom(
+                            backgroundColor: const Color(0xFF6047FF),
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(14),
+                            ),
+                          ),
                         ),
                       ),
                     ],
@@ -284,7 +322,7 @@ class _CartView extends StatelessWidget {
           return const Center(child: Text('Loading cart...'));
         },
       ),
-      bottomNavigationBar: null,
+      bottomNavigationBar: const ShopBottomNavigation(currentIndex: 2),
     );
   }
 }

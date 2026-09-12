@@ -20,6 +20,26 @@ void main() {
   late MockUserRepoImpelement mockRepository;
   late MockSharedPreferencesService mockSharedPreferencesService;
 
+  setUpAll(() {
+    registerFallbackValue(const RegisterParam(
+      name: 'Test User',
+      email: 'test@example.com',
+      phone: '1234567890',
+      password: 'password123',
+    ));
+    registerFallbackValue(const LoginParams(
+      email: 'test@example.com',
+      password: 'password123',
+    ));
+    registerFallbackValue(const OtpVerifyParams(
+      email: 'test@example.com',
+      otpCode: '123456',
+    ));
+    registerFallbackValue(const OtpResendParams(
+      email: 'test@example.com',
+    ));
+  });
+
   setUp(() {
     mockRepository = MockUserRepoImpelement();
     mockSharedPreferencesService = MockSharedPreferencesService();
@@ -34,10 +54,10 @@ void main() {
     );
 
     test('initial state is AuthInitial', () {
-      when(() => SharedPreferencesService.instance)
-          .thenReturn(mockSharedPreferencesService);
-      
-      final cubit = AuthCubit(repository: mockRepository);
+      final cubit = AuthCubit(
+        repository: mockRepository,
+        sharedPreferencesService: mockSharedPreferencesService,
+      );
       expect(cubit.state, isA<AuthInitial>());
       cubit.close();
     });
@@ -46,8 +66,6 @@ void main() {
       blocTest<AuthCubit, AuthState>(
         'emits [AuthLoading, AuthSuccess] when registration succeeds',
         setUp: () {
-          when(() => SharedPreferencesService.instance)
-              .thenReturn(mockSharedPreferencesService);
           when(() => mockRepository.registerUser(params: any(named: 'params')))
               .thenAnswer((_) async => Right(testUser));
           when(() => mockSharedPreferencesService.setAuthToken(any()))
@@ -55,7 +73,10 @@ void main() {
           when(() => mockSharedPreferencesService.setAuthName(any()))
               .thenAnswer((_) async => Future.value());
         },
-        build: () => AuthCubit(repository: mockRepository),
+        build: () => AuthCubit(
+          repository: mockRepository,
+          sharedPreferencesService: mockSharedPreferencesService,
+        ),
         act: (cubit) => cubit.register(
           params: const RegisterParam(
             name: 'Test User',
@@ -76,12 +97,13 @@ void main() {
       blocTest<AuthCubit, AuthState>(
         'emits [AuthLoading, AuthError] when registration fails',
         setUp: () {
-          when(() => SharedPreferencesService.instance)
-              .thenReturn(mockSharedPreferencesService);
           when(() => mockRepository.registerUser(params: any(named: 'params')))
               .thenAnswer((_) async => const Left(FailerModels()));
         },
-        build: () => AuthCubit(repository: mockRepository),
+        build: () => AuthCubit(
+          repository: mockRepository,
+          sharedPreferencesService: mockSharedPreferencesService,
+        ),
         act: (cubit) => cubit.register(
           params: const RegisterParam(
             name: 'Test User',
@@ -98,8 +120,6 @@ void main() {
       blocTest<AuthCubit, AuthState>(
         'emits [AuthLoading, AuthSuccess] when login succeeds',
         setUp: () {
-          when(() => SharedPreferencesService.instance)
-              .thenReturn(mockSharedPreferencesService);
           when(() => mockRepository.logIN(params: any(named: 'params')))
               .thenAnswer((_) async => Right(testUser));
           when(() => mockSharedPreferencesService.setAuthToken(any()))
@@ -107,7 +127,10 @@ void main() {
           when(() => mockSharedPreferencesService.setAuthName(any()))
               .thenAnswer((_) async => Future.value());
         },
-        build: () => AuthCubit(repository: mockRepository),
+        build: () => AuthCubit(
+          repository: mockRepository,
+          sharedPreferencesService: mockSharedPreferencesService,
+        ),
         act: (cubit) => cubit.login(
           params: const LoginParams(
             email: 'test@example.com',
@@ -126,12 +149,13 @@ void main() {
       blocTest<AuthCubit, AuthState>(
         'emits [AuthLoading, AuthError] when login fails',
         setUp: () {
-          when(() => SharedPreferencesService.instance)
-              .thenReturn(mockSharedPreferencesService);
           when(() => mockRepository.logIN(params: any(named: 'params')))
               .thenAnswer((_) async => const Left(FailerModels()));
         },
-        build: () => AuthCubit(repository: mockRepository),
+        build: () => AuthCubit(
+          repository: mockRepository,
+          sharedPreferencesService: mockSharedPreferencesService,
+        ),
         act: (cubit) => cubit.login(
           params: const LoginParams(
             email: 'test@example.com',
@@ -146,8 +170,6 @@ void main() {
       blocTest<AuthCubit, AuthState>(
         'emits [AuthLoading, AuthSuccess] when OTP verification succeeds',
         setUp: () {
-          when(() => SharedPreferencesService.instance)
-              .thenReturn(mockSharedPreferencesService);
           when(() => mockRepository.verifyOTP(params: any(named: 'params')))
               .thenAnswer((_) async => Right(testUser));
           when(() => mockSharedPreferencesService.setAuthToken(any()))
@@ -155,7 +177,10 @@ void main() {
           when(() => mockSharedPreferencesService.setAuthName(any()))
               .thenAnswer((_) async => Future.value());
         },
-        build: () => AuthCubit(repository: mockRepository),
+        build: () => AuthCubit(
+          repository: mockRepository,
+          sharedPreferencesService: mockSharedPreferencesService,
+        ),
         act: (cubit) => cubit.verifyOtp(
           params: const OtpVerifyParams(
             email: 'test@example.com',
@@ -174,12 +199,13 @@ void main() {
       blocTest<AuthCubit, AuthState>(
         'emits [AuthLoading, AuthError] when OTP verification fails',
         setUp: () {
-          when(() => SharedPreferencesService.instance)
-              .thenReturn(mockSharedPreferencesService);
           when(() => mockRepository.verifyOTP(params: any(named: 'params')))
               .thenAnswer((_) async => const Left(FailerModels()));
         },
-        build: () => AuthCubit(repository: mockRepository),
+        build: () => AuthCubit(
+          repository: mockRepository,
+          sharedPreferencesService: mockSharedPreferencesService,
+        ),
         act: (cubit) => cubit.verifyOtp(
           params: const OtpVerifyParams(
             email: 'test@example.com',
@@ -194,12 +220,13 @@ void main() {
       blocTest<AuthCubit, AuthState>(
         'emits [AuthLoading, AuthInitial] when OTP resend succeeds',
         setUp: () {
-          when(() => SharedPreferencesService.instance)
-              .thenReturn(mockSharedPreferencesService);
           when(() => mockRepository.resendOTP(params: any(named: 'params')))
               .thenAnswer((_) async => const Right(true));
         },
-        build: () => AuthCubit(repository: mockRepository),
+        build: () => AuthCubit(
+          repository: mockRepository,
+          sharedPreferencesService: mockSharedPreferencesService,
+        ),
         act: (cubit) => cubit.resendOtp(
           params: const OtpResendParams(
             email: 'test@example.com',
@@ -211,12 +238,13 @@ void main() {
       blocTest<AuthCubit, AuthState>(
         'emits [AuthLoading, AuthError] when OTP resend fails',
         setUp: () {
-          when(() => SharedPreferencesService.instance)
-              .thenReturn(mockSharedPreferencesService);
           when(() => mockRepository.resendOTP(params: any(named: 'params')))
               .thenAnswer((_) async => const Left(FailerModels()));
         },
-        build: () => AuthCubit(repository: mockRepository),
+        build: () => AuthCubit(
+          repository: mockRepository,
+          sharedPreferencesService: mockSharedPreferencesService,
+        ),
         act: (cubit) => cubit.resendOtp(
           params: const OtpResendParams(
             email: 'test@example.com',
@@ -230,12 +258,13 @@ void main() {
       blocTest<AuthCubit, AuthState>(
         'calls clearAuthData on SharedPreferencesService',
         setUp: () {
-          when(() => SharedPreferencesService.instance)
-              .thenReturn(mockSharedPreferencesService);
           when(() => mockSharedPreferencesService.clearAuthData())
               .thenAnswer((_) async => Future.value());
         },
-        build: () => AuthCubit(repository: mockRepository),
+        build: () => AuthCubit(
+          repository: mockRepository,
+          sharedPreferencesService: mockSharedPreferencesService,
+        ),
         act: (cubit) => cubit.clearAuthData(),
         verify: (_) {
           verify(() => mockSharedPreferencesService.clearAuthData()).called(1);
@@ -247,12 +276,13 @@ void main() {
       blocTest<AuthCubit, AuthState>(
         'returns token from SharedPreferencesService',
         setUp: () {
-          when(() => SharedPreferencesService.instance)
-              .thenReturn(mockSharedPreferencesService);
           when(() => mockSharedPreferencesService.getAuthToken())
               .thenAnswer((_) async => 'test_token');
         },
-        build: () => AuthCubit(repository: mockRepository),
+        build: () => AuthCubit(
+          repository: mockRepository,
+          sharedPreferencesService: mockSharedPreferencesService,
+        ),
         act: (cubit) async {
           final token = await cubit.getAuthToken();
           expect(token, 'test_token');

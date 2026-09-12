@@ -17,6 +17,8 @@ class ShopBottomNavigation extends StatelessWidget {
     
     final authToken = await SharedPreferencesService.instance.getAuthToken();
     
+    if (!context.mounted) return;
+    
     Widget page;
     switch (index) {
       case 0:

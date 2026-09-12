@@ -31,9 +31,23 @@ class RegisterRemoteDataSource {
     if (response.statusCode == null ||
         response.statusCode! < 200 ||
         response.statusCode! >= 300) {
-      final message = response.data is Map<String, dynamic>
-          ? (response.data['message'] ?? 'Registration failed')
-          : 'Registration failed';
+      String message = 'Registration failed';
+      if (response.data is Map<String, dynamic>) {
+        final data = response.data as Map<String, dynamic>;
+        if (data['errors'] != null && data['errors'] is Map) {
+          final errors = data['errors'] as Map;
+          if (errors.isNotEmpty) {
+            final firstError = errors.values.first;
+            if (firstError is List && firstError.isNotEmpty) {
+              message = firstError.first.toString();
+            } else {
+              message = firstError.toString();
+            }
+          }
+        } else {
+          message = data['message'] ?? message;
+        }
+      }
       throw DioException(
         requestOptions: response.requestOptions,
         error: message,
@@ -53,9 +67,23 @@ class RegisterRemoteDataSource {
     if (response.statusCode == null ||
         response.statusCode! < 200 ||
         response.statusCode! >= 300) {
-      final message = response.data is Map<String, dynamic>
-          ? (response.data['message'] ?? 'Login failed')
-          : 'Login failed';
+      String message = 'Login failed';
+      if (response.data is Map<String, dynamic>) {
+        final data = response.data as Map<String, dynamic>;
+        if (data['errors'] != null && data['errors'] is Map) {
+          final errors = data['errors'] as Map;
+          if (errors.isNotEmpty) {
+            final firstError = errors.values.first;
+            if (firstError is List && firstError.isNotEmpty) {
+              message = firstError.first.toString();
+            } else {
+              message = firstError.toString();
+            }
+          }
+        } else {
+          message = data['message'] ?? message;
+        }
+      }
       throw DioException(
         requestOptions: response.requestOptions,
         error: message,

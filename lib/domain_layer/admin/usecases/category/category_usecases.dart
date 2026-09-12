@@ -27,7 +27,7 @@ class DeleteCategoryUseCase extends UseCase<Response, String> {
   final CategoryRepository repository;
   DeleteCategoryUseCase(this.repository);
   @override
-  Future<Response> call(String id) async => await repository.deleteCategory(id: id);
+  Future<Response> call(String slug) async => await repository.deleteCategory(slug: slug);
 }
 
 class CategoryParams {

@@ -1,3 +1,5 @@
+// ignore_for_file: unused_local_variable
+
 import 'package:buy_verse_app/core_layer/admin/helpers/app_localization.dart';
 import 'package:buy_verse_app/presentation_layer/admin_version/pages/login&register/login_screen.dart';
 import 'package:buy_verse_app/presentation_layer/admin_version/pages/profile/edit_profile.dart';
@@ -165,7 +167,11 @@ class ProfilePage extends StatelessWidget {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Icon(Icons.error_outline, color: Colors.red, size: 60),
+                      const Icon(
+                        Icons.error_outline,
+                        color: Colors.red,
+                        size: 60,
+                      ),
                       const Gap(10),
                       Text(
                         state.message,

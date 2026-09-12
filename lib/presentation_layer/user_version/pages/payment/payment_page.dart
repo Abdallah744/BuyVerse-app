@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../../domain_layer/user/repositories/payment/payment_repository_impl.dart';
 import '../../../../data_layer/user/remote_data/payment_remote_data_source.dart';
+import '../../../../domain_layer/user/repositories/payment/payment_repository_impl.dart';
 import '../../state_management/payment/payment_cubit.dart';
+import '../../widgets/shop_bottom_navigation.dart';
 
 class PaymentPage extends StatelessWidget {
   const PaymentPage({
@@ -178,6 +179,7 @@ class _PaymentViewState extends State<_PaymentView> {
           );
         },
       ),
+      bottomNavigationBar: const ShopBottomNavigation(currentIndex: 2),
     );
   }
 }

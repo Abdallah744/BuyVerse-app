@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../../domain_layer/user/repositories/payment/checkout_repository_impl.dart';
 import '../../../../data_layer/user/remote_data/checkout_remote_data_source.dart';
+import '../../../../domain_layer/user/repositories/payment/checkout_repository_impl.dart';
 import '../../state_management/payment/checkout_cubit.dart';
 import 'payment_page.dart';
 
@@ -253,7 +253,9 @@ class _CheckoutViewState extends State<_CheckoutView> {
                             context.read<CheckoutCubit>().createOrder(
                               productIds: widget.productIds,
                               quantities: widget.quantities,
-                              prices: widget.prices,
+                              prices: widget.prices
+                                  .map((e) => e.toInt())
+                                  .toList(),
                               address: address,
                               latitude: latitude,
                               longitude: longitude,

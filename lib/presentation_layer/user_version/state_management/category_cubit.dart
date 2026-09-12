@@ -1,6 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../data_layer/user/category_repository_impl.dart';
+import 'package:buy_verse_app/domain_layer/user/repositories/category_repository.dart';
 import '../../../data_layer/user/user_models/category_model.dart';
 
 abstract class CategoryState {}
@@ -26,7 +26,7 @@ class CategoryError extends CategoryState {
 class CategoryCubit extends Cubit<CategoryState> {
   CategoryCubit(this.repository) : super(CategoryInitial());
 
-  final CategoryRepositoryImpl repository;
+  final CategoryRepository repository;
 
   Future<void> fetchCategories({String? token}) async {
     emit(CategoryLoading());

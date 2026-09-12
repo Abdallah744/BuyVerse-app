@@ -1,6 +1,6 @@
-import 'product_repository.dart';
-import '../../../../data_layer/user/user_models/product_model.dart';
-import '../../../../data_layer/user/user_models/product_remote_data_source.dart';
+import 'package:buy_verse_app/domain_layer/user/repositories/products/product_repository.dart';
+import 'package:buy_verse_app/data_layer/user/user_models/product_model.dart';
+import 'package:buy_verse_app/data_layer/user/user_models/product_remote_data_source.dart';
 
 class ProductRepositoryImpl implements ProductRepository {
   const ProductRepositoryImpl(this.remoteDataSource);

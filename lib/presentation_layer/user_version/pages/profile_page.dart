@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
-import 'edit_profile_page.dart';
-import '../../../data_layer/user/services/shared_preferences_service.dart';
+
 import '../../../data_layer/user/remote_data/profile_remote_data_source.dart';
+import '../../../data_layer/user/services/shared_preferences_service.dart';
 import '../../../data_layer/user/user_models/user_models.dart';
 import '../widgets/logout_button.dart';
+import '../widgets/shop_bottom_navigation.dart';
+import 'edit_profile_page.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key, this.authToken});
@@ -24,7 +26,9 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Future<_ProfileData> _loadProfile() async {
-    final token = widget.authToken ?? await SharedPreferencesService.instance.getAuthToken();
+    final token =
+        widget.authToken ??
+        await SharedPreferencesService.instance.getAuthToken();
     if (token == null || token.isEmpty) {
       throw StateError('Please login to view your profile.');
     }
@@ -166,6 +170,7 @@ class _ProfilePageState extends State<ProfilePage> {
           );
         },
       ),
+      bottomNavigationBar: const ShopBottomNavigation(currentIndex: 4),
     );
   }
 

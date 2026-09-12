@@ -1,57 +1,54 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
 
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../data_layer/user/services/shared_preferences_service.dart';
-
-import '../../../core_layer/user/core/theme/theme_mode_scope.dart';
-import '../../../data_layer/user/category_repository_impl.dart';
-import '../../../data_layer/user/remote_data/category_remote_data_source.dart';
-import '../../../data_layer/user/remote_data/profile_remote_data_source.dart';
 import '../../../data_layer/user/user_models/category_model.dart';
 import '../../../data_layer/user/user_models/product_model.dart';
-import '../../../data_layer/user/user_models/product_remote_data_source.dart';
-import '../../../data_layer/user/user_models/user_models.dart';
-import '../../../domain_layer/user/repositories/products/product_repository_impl.dart';
-import 'product_details_page.dart';
 import '../state_management/auth/auth_cubit.dart';
 import '../state_management/category_cubit.dart';
+import '../state_management/profile/profile_cubit.dart';
 import '../state_management/proudcts/product_cubit.dart';
 import '../widgets/shop_bottom_navigation.dart';
+import 'product_details_page.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key, this.authToken, this.compact = false});
 
   final String? authToken;
   final bool compact;
 
   @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  @override
+  void initState() {
+    super.initState();
+    context.read<ProductCubit>().fetchProducts(token: widget.authToken);
+    context.read<CategoryCubit>().fetchCategories(token: widget.authToken);
+    context.read<UserProfileCubit>().fetchProfile(token: widget.authToken);
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return MultiBlocProvider(
-      providers: [
-        BlocProvider(
-          create: (_) =>
-              ProductCubit(ProductRepositoryImpl(ProductRemoteDataSource()))
-                ..fetchProducts(token: authToken),
-        ),
-        BlocProvider(
-          create: (_) =>
-              CategoryCubit(CategoryRepositoryImpl(CategoryRemoteDataSource()))
-                ..fetchCategories(token: authToken),
-        ),
-      ],
-      child: _HomeView(authToken: authToken, compact: compact),
-    );
+    return _HomeView(authToken: widget.authToken, compact: widget.compact);
   }
 }
 
-class _HomeView extends StatelessWidget {
+class _HomeView extends StatefulWidget {
   const _HomeView({required this.authToken, required this.compact});
 
   final String? authToken;
   final bool compact;
+
+  @override
+  State<_HomeView> createState() => _HomeViewState();
+}
+
+class _HomeViewState extends State<_HomeView> {
+  int? _selectedCategoryId;
 
   @override
   Widget build(BuildContext context) {
@@ -61,7 +58,7 @@ class _HomeView extends StatelessWidget {
         child: CustomScrollView(
           slivers: [
             SliverToBoxAdapter(
-              child: _Header(compact: compact, authToken: authToken),
+              child: _Header(compact: widget.compact, authToken: widget.authToken),
             ),
             SliverToBoxAdapter(
               child: BlocBuilder<CategoryCubit, CategoryState>(
@@ -101,6 +98,60 @@ class _HomeView extends StatelessWidget {
                   ],
                 ),
               ),
+            ),
+            BlocBuilder<CategoryCubit, CategoryState>(
+              builder: (context, categoryState) {
+                final categories = categoryState is CategoryLoaded
+                    ? categoryState.categories
+                    : const <CategoryModel>[];
+                
+                // If categories exist, show filter chips
+                if (categories.isNotEmpty) {
+                  return SliverToBoxAdapter(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 18),
+                          child: Wrap(
+                            spacing: 8,
+                            runSpacing: 8,
+                            children: [
+                              _FilterChip(
+                                label: 'All',
+                                isSelected: _selectedCategoryId == null,
+                                onTap: () {
+                                  setState(() {
+                                    _selectedCategoryId = null;
+                                  });
+                                  context.read<ProductCubit>().fetchProducts(token: widget.authToken);
+                                },
+                              ),
+                              ...categories.map((category) => _FilterChip(
+                                label: category.name,
+                                isSelected: _selectedCategoryId == category.id,
+                                onTap: () {
+                                  setState(() {
+                                    _selectedCategoryId = category.id;
+                                  });
+                                  // Filter products by category
+                                  context.read<ProductCubit>().fetchProducts(
+                                    token: widget.authToken,
+                                    categoryId: category.id,
+                                  );
+                                },
+                              )),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                      ],
+                    ),
+                  );
+                }
+                
+                return const SliverToBoxAdapter();
+              },
             ),
             BlocBuilder<ProductCubit, ProductState>(
               builder: (context, state) {
@@ -144,7 +195,7 @@ class _HomeView extends StatelessWidget {
                           MaterialPageRoute(
                             builder: (_) => ProductDetailsPage(
                               slug: product.slug ?? product.id.toString(),
-                              authToken: authToken,
+                              authToken: widget.authToken,
                               product: product,
                             ),
                           ),
@@ -163,56 +214,14 @@ class _HomeView extends StatelessWidget {
   }
 }
 
-class Home2Page extends StatelessWidget {
-  const Home2Page({super.key, this.authToken});
-
-  final String? authToken;
-
-  @override
-  Widget build(BuildContext context) {
-    return HomePage(authToken: authToken, compact: true);
-  }
-}
-
-class _Header extends StatefulWidget {
+class _Header extends StatelessWidget {
   const _Header({required this.compact, this.authToken});
 
   final bool compact;
   final String? authToken;
 
   @override
-  State<_Header> createState() => _HeaderState();
-}
-
-class _HeaderState extends State<_Header> {
-  late final Future<UserModels?> _profileFuture;
-
-  @override
-  void initState() {
-    super.initState();
-    _profileFuture = _loadProfile();
-  }
-
-  Future<UserModels?> _loadProfile() async {
-    final token = widget.authToken ?? await SharedPreferencesService.instance.getAuthToken();
-    if (token == null || token.trim().isEmpty) return null;
-    try {
-      return await ProfileRemoteDataSource().getProfile(token: token);
-    } on DioException {
-      final savedName = await SharedPreferencesService.instance.getAuthName();
-      if (savedName == null || savedName.trim().isEmpty) return null;
-      return UserModels(name: savedName, email: '', phone: '');
-    }
-  }
-
-  @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final textColor = isDark ? Colors.white : const Color(0xFF101828);
-    final secondaryColor = isDark
-        ? const Color(0xFFB0B0B0)
-        : const Color(0xFF98A2B3);
-
     return Padding(
       padding: const EdgeInsets.fromLTRB(18, 14, 18, 12),
       child: Column(
@@ -233,62 +242,44 @@ class _HeaderState extends State<_Header> {
                       ),
                     ),
                     const SizedBox(height: 4),
-                    BlocBuilder<AuthCubit, AuthState>(
+                    BlocBuilder<UserProfileCubit, UserProfileState>(
                       builder: (context, state) {
-                        final authName = state is AuthSuccess
-                            ? state.user.name
-                            : null;
-                        return FutureBuilder<UserModels?>(
-                          future: _profileFuture,
-                          builder: (context, snapshot) {
-                            final profileName = snapshot.data?.name;
-                            final name = (authName ?? profileName ?? 'User')
-                                .trim();
-                            return Text(
-                              name.isEmpty ? 'User' : name,
-                              style: TextStyle(
-                                fontSize: 17,
-                                fontWeight: FontWeight.w800,
-                                color: textColor,
-                              ),
-                            );
-                          },
+                        String name = 'User';
+                        if (state is ProfileLoaded) {
+                          name = state.user.name ?? 'User';
+                        } else {
+                          final authState = context.read<AuthCubit>().state;
+                          if (authState is AuthSuccess) {
+                            name = authState.user.name ?? 'User';
+                          }
+                        }
+                        return Text(
+                          name.trim().isEmpty ? 'User' : name,
+                          style: const TextStyle(
+                            fontSize: 17,
+                            fontWeight: FontWeight.w800,
+                            color: Color(0xFF101828),
+                          ),
                         );
                       },
                     ),
                   ],
                 ),
               ),
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  IconButton(
-                    tooltip: 'Toggle dark mode',
-                    onPressed: ThemeModeScope.of(context).onToggle,
-                    icon: Icon(
-                      Theme.of(context).brightness == Brightness.dark
-                          ? Icons.light_mode_outlined
-                          : Icons.dark_mode_outlined,
-                    ),
-                  ),
-                  const CircleAvatar(
-                    radius: 19,
-                    backgroundColor: Color(0xFFFF6900),
-                    child: Icon(Icons.person, color: Colors.white),
-                  ),
-                ],
+              const CircleAvatar(
+                radius: 19,
+                backgroundColor: Color(0xFFFF6900),
+                child: Icon(Icons.person, color: Colors.white),
               ),
             ],
           ),
           const SizedBox(height: 16),
           TextField(
             decoration: InputDecoration(
-              hintText: widget.compact
-                  ? 'Search products...'
-                  : 'Search products...',
-              prefixIcon: Icon(Icons.search, color: secondaryColor),
+              hintText: 'Search products...',
+              prefixIcon: const Icon(Icons.search, color: Color(0xFF98A2B3)),
               filled: true,
-              fillColor: isDark ? const Color(0xFF1E1E1E) : Colors.white,
+              fillColor: Colors.white,
               contentPadding: const EdgeInsets.symmetric(vertical: 12),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(11),
@@ -379,7 +370,9 @@ class _ProductCard extends StatelessWidget {
                 borderRadius: const BorderRadius.vertical(
                   top: Radius.circular(14),
                 ),
-                child: product.image != null && (product.image?.isNotEmpty ?? false)
+                child:
+                    product.image != null &&
+                        (product.image?.isNotEmpty ?? false)
                     ? Image.network(
                         product.image ?? '',
                         width: double.infinity,
@@ -421,6 +414,34 @@ class _ProductCard extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+class _FilterChip extends StatelessWidget {
+  const _FilterChip({
+    required this.label,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  final String label;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return FilterChip(
+      label: Text(label),
+      selected: isSelected,
+      onSelected: (_) => onTap(),
+      selectedColor: const Color(0xFFFF6900),
+      labelStyle: TextStyle(
+        color: isSelected ? Colors.white : const Color(0xFF475467),
+        fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+      ),
+      backgroundColor: Colors.white,
+      side: const BorderSide(color: Color(0xFFE5E7EB)),
     );
   }
 }

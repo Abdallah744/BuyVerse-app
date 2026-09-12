@@ -1,11 +1,16 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+// ignore_for_file: unnecessary_null_comparison
 
 import 'package:buy_verse_app/data_layer/user/services/shared_preferences_service.dart';
 import 'package:buy_verse_app/data_layer/user/user_models/product_details_remote_data_source.dart';
-import 'package:buy_verse_app/domain_layer/user/repositories/products/product_details_repository_impl.dart';
 import 'package:buy_verse_app/data_layer/user/user_models/product_model.dart';
+import 'package:buy_verse_app/domain_layer/user/repositories/products/product_details_repository_impl.dart';
+import 'package:buy_verse_app/presentation_layer/user_version/state_management/proudcts/cart_cubit.dart';
 import 'package:buy_verse_app/presentation_layer/user_version/state_management/proudcts/product_details_cubit.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+import '../../../data_layer/user/remote_data/cart_remote_data_source.dart';
+import '../../../domain_layer/user/repositories/products/cart_repository_impl.dart';
 
 class ProductDetailsPage extends StatelessWidget {
   const ProductDetailsPage({
@@ -21,10 +26,17 @@ class ProductDetailsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => ProductDetailsCubit(
-        ProductDetailsRepositoryImpl(ProductDetailsRemoteDataSource()),
-      )..fetchProductBySlug(slug: slug, token: authToken),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create: (_) => ProductDetailsCubit(
+            ProductDetailsRepositoryImpl(ProductDetailsRemoteDataSource()),
+          )..fetchProductBySlug(slug: slug, token: authToken),
+        ),
+        BlocProvider(
+          create: (_) => CartCubit(CartRepositoryImpl(CartRemoteDataSource())),
+        ),
+      ],
       child: _ProductDetailsView(
         authToken: authToken,
         initialProduct: product,
@@ -77,8 +89,11 @@ class _ProductDetailsView extends StatelessWidget {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(Icons.error_outline_rounded,
-                        size: 54, color: Colors.red),
+                    const Icon(
+                      Icons.error_outline_rounded,
+                      size: 54,
+                      color: Colors.red,
+                    ),
                     const SizedBox(height: 12),
                     Text(
                       state.message,
@@ -92,10 +107,7 @@ class _ProductDetailsView extends StatelessWidget {
                     FilledButton(
                       onPressed: () => context
                           .read<ProductDetailsCubit>()
-                          .fetchProductBySlug(
-                            slug: slug,
-                            token: authToken,
-                          ),
+                          .fetchProductBySlug(slug: slug, token: authToken),
                       style: FilledButton.styleFrom(
                         backgroundColor: const Color(0xFF6047FF),
                         foregroundColor: Colors.white,
@@ -108,7 +120,8 @@ class _ProductDetailsView extends StatelessWidget {
             );
           }
 
-          final product = initialProduct ??
+          final product =
+              initialProduct ??
               (state is ProductDetailsLoaded ? state.product : null);
 
           if (product == null) {
@@ -122,7 +135,9 @@ class _ProductDetailsView extends StatelessWidget {
               children: [
                 ClipRRect(
                   borderRadius: BorderRadius.circular(24),
-                  child: product.image != null && (product.image?.isNotEmpty ?? false)
+                  child:
+                      product.image != null &&
+                          (product.image?.isNotEmpty ?? false)
                       ? Image.network(
                           product.image ?? '',
                           height: 280,
@@ -161,8 +176,10 @@ class _ProductDetailsView extends StatelessWidget {
                 ),
                 const SizedBox(height: 10),
                 Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 8,
+                  ),
                   decoration: BoxDecoration(
                     color: const Color(0xFF6047FF).withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(999),
@@ -208,7 +225,35 @@ class _ProductDetailsView extends StatelessWidget {
                 SizedBox(
                   width: double.infinity,
                   child: FilledButton.icon(
-                    onPressed: () {},
+                    onPressed: () async {
+                      final productId = product.id;
+                      if (productId != null) {
+                        try {
+                          await context.read<CartCubit>().addToCart(
+                            productId: productId,
+                            quantity: 1,
+                            token: authToken,
+                          );
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Added to cart successfully'),
+                                backgroundColor: Colors.green,
+                              ),
+                            );
+                          }
+                        } catch (error) {
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('Failed to add to cart: $error'),
+                                backgroundColor: Colors.red,
+                              ),
+                            );
+                          }
+                        }
+                      }
+                    },
                     icon: const Icon(Icons.shopping_cart_outlined),
                     label: const Text('Add to Cart'),
                     style: FilledButton.styleFrom(
@@ -258,7 +303,9 @@ class _FavoriteButtonState extends State<_FavoriteButton> {
   }
 
   Future<void> _toggle() async {
-    final ids = (await SharedPreferencesService.instance.getFavoriteProductIds()).toSet();
+    final ids =
+        (await SharedPreferencesService.instance.getFavoriteProductIds())
+            .toSet();
     if (_isFavorite) {
       ids.remove(widget.productId.toString());
     } else {

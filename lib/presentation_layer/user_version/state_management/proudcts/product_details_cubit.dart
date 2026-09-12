@@ -1,7 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-
-import '../../../../domain_layer/user/repositories/products/product_details_repository_impl.dart';
-import '../../../../data_layer/user/user_models/product_model.dart';
+import 'package:buy_verse_app/domain_layer/user/repositories/products/product_details_repository.dart';
+import 'package:buy_verse_app/data_layer/user/user_models/product_model.dart';
 
 abstract class ProductDetailsState {}
 
@@ -24,7 +23,7 @@ class ProductDetailsError extends ProductDetailsState {
 class ProductDetailsCubit extends Cubit<ProductDetailsState> {
   ProductDetailsCubit(this.repository) : super(ProductDetailsInitial());
 
-  final ProductDetailsRepositoryImpl repository;
+  final ProductDetailsRepository repository;
 
   Future<void> fetchProductBySlug({required String slug, String? token}) async {
     emit(ProductDetailsLoading());

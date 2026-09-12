@@ -26,9 +26,9 @@ class EditCategory extends CategoryEvent {
 }
 
 class DeleteCategory extends CategoryEvent {
-  final String id;
-  const DeleteCategory(this.id);
+  final String slug;
+  const DeleteCategory(this.slug);
 
   @override
-  List<Object> get props => [id];
+  List<Object> get props => [slug];
 }

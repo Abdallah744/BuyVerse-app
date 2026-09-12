@@ -1,7 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-
-import '../../../../domain_layer/user/repositories/products/product_repository_impl.dart';
-import '../../../../data_layer/user/user_models/product_model.dart';
+import 'package:buy_verse_app/domain_layer/user/repositories/products/product_repository.dart';
+import 'package:buy_verse_app/data_layer/user/user_models/product_model.dart';
 
 abstract class ProductState {}
 
@@ -26,13 +25,13 @@ class ProductError extends ProductState {
 class ProductCubit extends Cubit<ProductState> {
   ProductCubit(this.repository) : super(ProductInitial());
 
-  final ProductRepositoryImpl repository;
+  final ProductRepository repository;
 
-  Future<void> fetchProducts({String? token}) async {
+  Future<void> fetchProducts({String? token, int? categoryId}) async {
     emit(ProductLoading());
 
     try {
-      final products = await repository.getProducts(token: token);
+      final products = await repository.getProducts(token: token, categoryId: categoryId);
       if (products.isEmpty) {
         emit(ProductEmpty());
       } else {

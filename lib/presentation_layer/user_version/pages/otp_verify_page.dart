@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:buy_verse_app/domain_layer/user/repo/auth_repo.dart';
 import 'package:buy_verse_app/presentation_layer/user_version/pages/home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -59,7 +60,7 @@ class _OtpVerifyPageState extends State<OtpVerifyPage> {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => AuthCubit(),
+      create: (_) => AuthCubit(repository: context.read<AuthRepo>()),
       child: Scaffold(
         backgroundColor: const Color(0xFFFFF9F5),
         appBar: AppBar(
@@ -74,7 +75,7 @@ class _OtpVerifyPageState extends State<OtpVerifyPage> {
           ),
         ),
         body: SafeArea(
-          child: Center(
+          child: SingleChildScrollView(
             child: Padding(
               padding: const EdgeInsets.all(24),
               child: BlocConsumer<AuthCubit, AuthState>(
@@ -208,8 +209,10 @@ class _OtpVerifyPageState extends State<OtpVerifyPage> {
                                 onPressed: isLoading
                                     ? null
                                     : () {
-                                        final currentState = _formKey.currentState;
-                                        if (currentState != null && currentState.validate()) {
+                                        final currentState =
+                                            _formKey.currentState;
+                                        if (currentState != null &&
+                                            currentState.validate()) {
                                           context.read<AuthCubit>().verifyOtp(
                                             params: OtpVerifyParams(
                                               email: _emailController.text

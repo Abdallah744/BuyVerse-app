@@ -1,7 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-
-import '../../../../domain_layer/user/repositories/payment/payment_repository_impl.dart';
-import '../../../../data_layer/user/user_models/payment_model.dart';
+import 'package:buy_verse_app/domain_layer/user/repositories/payment/payment_repository.dart';
+import 'package:buy_verse_app/data_layer/user/user_models/payment_model.dart';
 
 abstract class PaymentState {}
 
@@ -24,7 +23,7 @@ class PaymentError extends PaymentState {
 class PaymentCubit extends Cubit<PaymentState> {
   PaymentCubit(this.repository) : super(PaymentInitial());
 
-  final PaymentRepositoryImpl repository;
+  final PaymentRepository repository;
 
   Future<void> payOrder({
     required int orderId,

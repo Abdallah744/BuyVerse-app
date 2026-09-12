@@ -10,9 +10,14 @@ class ProductRemoteDataSource {
   final Dio dioClient;
   final String baseUrl;
 
-  Future<List<ProductModel>> getProducts({String? token}) async {
+  Future<List<ProductModel>> getProducts({String? token, int? categoryId}) async {
+    String url = '$baseUrl/client/products';
+    if (categoryId != null) {
+      url = '$baseUrl/client/products?category_id=$categoryId';
+    }
+    
     final response = await dioClient.get(
-      '$baseUrl/client/products',
+      url,
       options: Options(
         headers: {
           if (token != null && token.isNotEmpty)

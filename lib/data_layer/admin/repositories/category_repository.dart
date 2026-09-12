@@ -34,10 +34,12 @@ class CategoryRepository {
   }
 
   Future<Response> deleteCategory({
-    required String id,
+    required String slug,
   }) async {
+    print('DEBUG: Repository deleteCategory called with slug: $slug');
+    print('DEBUG: Full URL: /admin/categories/destroy/$slug');
     return await DioHelper.deleteData(
-      url: '/admin/categories/destroy/$id',
+      url: '/admin/categories/destroy/$slug',
     );
   }
 }

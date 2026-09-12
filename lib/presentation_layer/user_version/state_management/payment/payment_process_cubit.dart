@@ -1,7 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-
-import '../../../../domain_layer/user/repositories/payment/payment_process_repository_impl.dart';
-import '../../../../data_layer/user/user_models/payment_process_model.dart';
+import 'package:buy_verse_app/domain_layer/user/repositories/payment/payment_process_repository.dart';
+import 'package:buy_verse_app/data_layer/user/user_models/payment_process_model.dart';
 
 abstract class PaymentProcessState {}
 
@@ -24,7 +23,7 @@ class PaymentProcessError extends PaymentProcessState {
 class PaymentProcessCubit extends Cubit<PaymentProcessState> {
   PaymentProcessCubit(this.repository) : super(PaymentProcessInitial());
 
-  final PaymentProcessRepositoryImpl repository;
+  final PaymentProcessRepository repository;
 
   Future<void> processPayment({
     required Map<String, dynamic> paymentPayload,

@@ -4,7 +4,7 @@ import 'package:buy_verse_app/core_layer/user/core/params/otp_verify_params.dart
 import 'package:buy_verse_app/core_layer/user/core/params/register_param.dart';
 import 'package:buy_verse_app/data_layer/user/services/shared_preferences_service.dart';
 import 'package:buy_verse_app/domain_layer/user/entities/user_entites.dart';
-import 'package:buy_verse_app/domain_layer/user/repositories/user_repo_impelement.dart';
+import 'package:buy_verse_app/domain_layer/user/repo/auth_repo.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 abstract class AuthState {}
@@ -26,11 +26,14 @@ class AuthError extends AuthState {
 }
 
 class AuthCubit extends Cubit<AuthState> {
-  AuthCubit({UserRepoImpelement? repository})
-    : repository = repository ?? UserRepoImpelement(),
-      super(AuthInitial());
+  AuthCubit({
+    required this.repository,
+    SharedPreferencesService? sharedPreferencesService,
+  })  : _sharedPreferencesService = sharedPreferencesService ?? SharedPreferencesService.instance,
+        super(AuthInitial());
 
-  final UserRepoImpelement repository;
+  final AuthRepo repository;
+  final SharedPreferencesService _sharedPreferencesService;
 
   Future<void> register({required RegisterParam params}) async {
     emit(AuthLoading());
@@ -38,7 +41,7 @@ class AuthCubit extends Cubit<AuthState> {
     try {
       final result = await repository.registerUser(params: params);
       result.fold(
-        (_) => emit(AuthError('Registration failed. Please try again.')),
+        (failure) => emit(AuthError(failure.message)),
         (user) async {
           if (user.token != null && user.token!.isNotEmpty) {
             await saveAuthToken(user.token!);
@@ -60,7 +63,7 @@ class AuthCubit extends Cubit<AuthState> {
     try {
       final result = await repository.logIN(params: params);
       result.fold(
-        (_) => emit(AuthError('Login failed. Please check your credentials.')),
+        (failure) => emit(AuthError(failure.message)),
         (user) async {
           if (user.token != null && user.token!.isNotEmpty) {
             await saveAuthToken(user.token!);
@@ -82,7 +85,7 @@ class AuthCubit extends Cubit<AuthState> {
     try {
       final result = await repository.verifyOTP(params: params);
       result.fold(
-        (_) => emit(AuthError('OTP verification failed. Please try again.')),
+        (failure) => emit(AuthError(failure.message)),
         (user) async {
           if (user.token != null && user.token!.isNotEmpty) {
             await saveAuthToken(user.token!);
@@ -104,7 +107,7 @@ class AuthCubit extends Cubit<AuthState> {
     try {
       final result = await repository.resendOTP(params: params);
       result.fold(
-        (_) => emit(AuthError('Failed to resend OTP. Please try again.')),
+        (failure) => emit(AuthError(failure.message)),
         (_) => emit(AuthInitial()),
       );
     } catch (error) {
@@ -113,18 +116,18 @@ class AuthCubit extends Cubit<AuthState> {
   }
 
   Future<void> saveAuthToken(String token) async {
-    await SharedPreferencesService.instance.setAuthToken(token);
+    await _sharedPreferencesService.setAuthToken(token);
   }
 
   Future<void> saveAuthName(String name) async {
-    await SharedPreferencesService.instance.setAuthName(name);
+    await _sharedPreferencesService.setAuthName(name);
   }
 
   Future<void> clearAuthData() async {
-    await SharedPreferencesService.instance.clearAuthData();
+    await _sharedPreferencesService.clearAuthData();
   }
 
   Future<String?> getAuthToken() async {
-    return await SharedPreferencesService.instance.getAuthToken();
+    return await _sharedPreferencesService.getAuthToken();
   }
 }

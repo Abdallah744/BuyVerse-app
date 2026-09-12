@@ -1,7 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-
-import '../../../../domain_layer/user/repositories/payment/checkout_repository_impl.dart';
-import '../../../../data_layer/user/user_models/checkout_model.dart';
+import 'package:buy_verse_app/domain_layer/user/repositories/payment/checkout_repository.dart';
+import 'package:buy_verse_app/data_layer/user/user_models/checkout_model.dart';
 
 abstract class CheckoutState {}
 
@@ -24,12 +23,12 @@ class CheckoutError extends CheckoutState {
 class CheckoutCubit extends Cubit<CheckoutState> {
   CheckoutCubit(this.repository) : super(CheckoutInitial());
 
-  final CheckoutRepositoryImpl repository;
+  final CheckoutRepository repository;
 
   Future<void> createOrder({
     required List<int> productIds,
     required List<int> quantities,
-    required List<double> prices,
+    required List<int> prices,
     required String address,
     required double latitude,
     required double longitude,
@@ -42,7 +41,7 @@ class CheckoutCubit extends Cubit<CheckoutState> {
       final order = await repository.createOrder(
         productIds: productIds,
         quantities: quantities,
-        prices: prices,
+        prices: prices.map((e) => e.toDouble()).toList(),
         address: address,
         latitude: latitude,
         longitude: longitude,

@@ -7,6 +7,7 @@ import '../pages/order_details_page.dart';
 import '../state_management/orders/order_cubit.dart';
 import '../widgets/logout_button.dart';
 import '../widgets/order_card.dart';
+import '../widgets/shop_bottom_navigation.dart';
 
 class OrdersPage extends StatelessWidget {
   const OrdersPage({super.key, this.authToken});
@@ -144,7 +145,7 @@ class _OrdersView extends StatelessWidget {
           return const Center(child: Text('Fetching orders...'));
         },
       ),
-      bottomNavigationBar: null,
+      bottomNavigationBar: const ShopBottomNavigation(currentIndex: 3),
     );
   }
 }
