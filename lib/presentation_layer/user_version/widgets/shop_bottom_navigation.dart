@@ -1,20 +1,47 @@
 import 'package:flutter/material.dart';
 
+import '../../../data_layer/user/services/shared_preferences_service.dart';
+import '../pages/cart_page.dart';
+import '../pages/favorites_page.dart';
+import '../pages/home_page.dart';
+import '../pages/orders_page.dart';
+import '../pages/profile_page.dart';
+
 class ShopBottomNavigation extends StatelessWidget {
   const ShopBottomNavigation({required this.currentIndex, super.key});
 
   final int currentIndex;
 
-  void _open(BuildContext context, int index) {
+  void _open(BuildContext context, int index) async {
     if (index == currentIndex) return;
-    final routes = [
-      AppRoutes.home,
-      AppRoutes.favorites,
-      AppRoutes.cart,
-      AppRoutes.orders,
-      AppRoutes.profile,
-    ];
-    Navigator.pushReplacementNamed(context, routes[index]);
+    
+    final authToken = await SharedPreferencesService.instance.getAuthToken();
+    
+    Widget page;
+    switch (index) {
+      case 0:
+        page = HomePage(authToken: authToken);
+        break;
+      case 1:
+        page = FavoritesPage(authToken: authToken);
+        break;
+      case 2:
+        page = CartPage(authToken: authToken);
+        break;
+      case 3:
+        page = OrdersPage(authToken: authToken);
+        break;
+      case 4:
+        page = ProfilePage(authToken: authToken);
+        break;
+      default:
+        return;
+    }
+    
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (_) => page),
+    );
   }
 
   @override

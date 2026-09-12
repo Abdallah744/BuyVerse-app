@@ -3,7 +3,8 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+
+import '../../../data_layer/user/services/shared_preferences_service.dart';
 
 import '../../../core_layer/user/core/theme/theme_mode_scope.dart';
 import '../../../data_layer/user/category_repository_impl.dart';
@@ -14,7 +15,7 @@ import '../../../data_layer/user/user_models/product_model.dart';
 import '../../../data_layer/user/user_models/product_remote_data_source.dart';
 import '../../../data_layer/user/user_models/user_models.dart';
 import '../../../domain_layer/user/repositories/products/product_repository_impl.dart';
-import '../../admin_version/pages/product_pages/products/product_details.dart';
+import 'product_details_page.dart';
 import '../state_management/auth/auth_cubit.dart';
 import '../state_management/category_cubit.dart';
 import '../state_management/proudcts/product_cubit.dart';
@@ -193,13 +194,12 @@ class _HeaderState extends State<_Header> {
   }
 
   Future<UserModels?> _loadProfile() async {
-    final prefs = await SharedPreferences.getInstance();
-    final token = widget.authToken ?? prefs.getString('auth_token');
+    final token = widget.authToken ?? await SharedPreferencesService.instance.getAuthToken();
     if (token == null || token.trim().isEmpty) return null;
     try {
       return await ProfileRemoteDataSource().getProfile(token: token);
     } on DioException {
-      final savedName = prefs.getString('auth_name');
+      final savedName = await SharedPreferencesService.instance.getAuthName();
       if (savedName == null || savedName.trim().isEmpty) return null;
       return UserModels(name: savedName, email: '', phone: '');
     }
@@ -379,12 +379,12 @@ class _ProductCard extends StatelessWidget {
                 borderRadius: const BorderRadius.vertical(
                   top: Radius.circular(14),
                 ),
-                child: product.image != null && product.image!.isNotEmpty
+                child: product.image != null && (product.image?.isNotEmpty ?? false)
                     ? Image.network(
-                        product.image!,
+                        product.image ?? '',
                         width: double.infinity,
                         fit: BoxFit.cover,
-                        errorBuilder: (_, __, ___) => const Center(
+                        errorBuilder: (_, _, _) => const Center(
                           child: Icon(Icons.shopping_bag_outlined, size: 42),
                         ),
                       )

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'edit_profile_page.dart';
+import '../../../data_layer/user/services/shared_preferences_service.dart';
 import '../../../data_layer/user/remote_data/profile_remote_data_source.dart';
 import '../../../data_layer/user/user_models/user_models.dart';
 import '../widgets/logout_button.dart';
@@ -24,8 +24,7 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Future<_ProfileData> _loadProfile() async {
-    final prefs = await SharedPreferences.getInstance();
-    final token = widget.authToken ?? prefs.getString('auth_token');
+    final token = widget.authToken ?? await SharedPreferencesService.instance.getAuthToken();
     if (token == null || token.isEmpty) {
       throw StateError('Please login to view your profile.');
     }
@@ -89,7 +88,10 @@ class _ProfilePageState extends State<ProfilePage> {
             );
           }
 
-          final profile = snapshot.data!;
+          final profile = snapshot.data;
+          if (profile == null) {
+            return const Center(child: Text('Profile data not available'));
+          }
           final user = profile.user;
           return ListView(
             padding: const EdgeInsets.all(12),
@@ -219,10 +221,10 @@ class _ProfileHeader extends StatelessWidget {
           CircleAvatar(
             radius: 27,
             backgroundColor: const Color(0xFFFF6900),
-            backgroundImage: picture == null || picture!.isEmpty
+            backgroundImage: picture == null || (picture?.isEmpty ?? true)
                 ? null
-                : NetworkImage(picture!),
-            child: picture == null || picture!.isEmpty
+                : NetworkImage(picture ?? ''),
+            child: picture == null || (picture?.isEmpty ?? true)
                 ? const Icon(Icons.person, color: Colors.white, size: 30)
                 : null,
           ),

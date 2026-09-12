@@ -2,6 +2,7 @@ import 'package:buy_verse_app/core_layer/user/core/params/login_params.dart';
 import 'package:buy_verse_app/core_layer/user/core/params/otp_resend_params.dart';
 import 'package:buy_verse_app/core_layer/user/core/params/otp_verify_params.dart';
 import 'package:buy_verse_app/core_layer/user/core/params/register_param.dart';
+import 'package:buy_verse_app/data_layer/user/services/shared_preferences_service.dart';
 import 'package:buy_verse_app/domain_layer/user/entities/user_entites.dart';
 import 'package:buy_verse_app/domain_layer/user/repositories/user_repo_impelement.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -38,7 +39,15 @@ class AuthCubit extends Cubit<AuthState> {
       final result = await repository.registerUser(params: params);
       result.fold(
         (_) => emit(AuthError('Registration failed. Please try again.')),
-        (user) => emit(AuthSuccess(user)),
+        (user) async {
+          if (user.token != null && user.token!.isNotEmpty) {
+            await saveAuthToken(user.token!);
+          }
+          if (user.name != null && user.name!.isNotEmpty) {
+            await saveAuthName(user.name!);
+          }
+          emit(AuthSuccess(user));
+        },
       );
     } catch (error) {
       emit(AuthError(error.toString()));
@@ -52,7 +61,15 @@ class AuthCubit extends Cubit<AuthState> {
       final result = await repository.logIN(params: params);
       result.fold(
         (_) => emit(AuthError('Login failed. Please check your credentials.')),
-        (user) => emit(AuthSuccess(user)),
+        (user) async {
+          if (user.token != null && user.token!.isNotEmpty) {
+            await saveAuthToken(user.token!);
+          }
+          if (user.name != null && user.name!.isNotEmpty) {
+            await saveAuthName(user.name!);
+          }
+          emit(AuthSuccess(user));
+        },
       );
     } catch (error) {
       emit(AuthError(error.toString()));
@@ -66,7 +83,15 @@ class AuthCubit extends Cubit<AuthState> {
       final result = await repository.verifyOTP(params: params);
       result.fold(
         (_) => emit(AuthError('OTP verification failed. Please try again.')),
-        (user) => emit(AuthSuccess(user)),
+        (user) async {
+          if (user.token != null && user.token!.isNotEmpty) {
+            await saveAuthToken(user.token!);
+          }
+          if (user.name != null && user.name!.isNotEmpty) {
+            await saveAuthName(user.name!);
+          }
+          emit(AuthSuccess(user));
+        },
       );
     } catch (error) {
       emit(AuthError(error.toString()));
@@ -85,5 +110,21 @@ class AuthCubit extends Cubit<AuthState> {
     } catch (error) {
       emit(AuthError(error.toString()));
     }
+  }
+
+  Future<void> saveAuthToken(String token) async {
+    await SharedPreferencesService.instance.setAuthToken(token);
+  }
+
+  Future<void> saveAuthName(String name) async {
+    await SharedPreferencesService.instance.setAuthName(name);
+  }
+
+  Future<void> clearAuthData() async {
+    await SharedPreferencesService.instance.clearAuthData();
+  }
+
+  Future<String?> getAuthToken() async {
+    return await SharedPreferencesService.instance.getAuthToken();
   }
 }

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../data_layer/user/services/shared_preferences_service.dart';
 import '../../../data_layer/user/user_models/product_model.dart';
 import '../../../data_layer/user/user_models/product_remote_data_source.dart';
-import '../../admin_version/pages/product_pages/products/product_details.dart';
+import 'product_details_page.dart';
 import '../widgets/shop_bottom_navigation.dart';
 
 class FavoritesPage extends StatefulWidget {
@@ -27,13 +27,10 @@ class _FavoritesPageState extends State<FavoritesPage> {
 
   /// **************************************************************************
   Future<List<ProductModel>> _loadProducts() async {
-    final prefs = await SharedPreferences.getInstance();
+    final token = widget.authToken ?? await SharedPreferencesService.instance.getAuthToken();
 
-    final token = widget.authToken ?? prefs.getString('auth_token');
-
-    _favoriteIds = (prefs.getStringList('favorite_product_ids') ?? [])
-        .map(int.tryParse)
-        .whereType<int>()
+    _favoriteIds = (await SharedPreferencesService.instance.getFavoriteProductIds())
+        .map((id) => int.tryParse(id) ?? 0)
         .toSet();
 
     return ProductRemoteDataSource().getProducts(token: token);
@@ -41,14 +38,12 @@ class _FavoritesPageState extends State<FavoritesPage> {
 
   /// **************************************************************************
   Future<void> _toggleFavorite(ProductModel product) async {
-    final prefs = await SharedPreferences.getInstance();
     setState(() {
       if (!_favoriteIds.add(product.id)) {
         _favoriteIds.remove(product.id);
       }
     });
-    await prefs.setStringList(
-      'favorite_product_ids',
+    await SharedPreferencesService.instance.setFavoriteProductIds(
       _favoriteIds.map((id) => id.toString()).toList(),
     );
   }
@@ -68,7 +63,7 @@ class _FavoritesPageState extends State<FavoritesPage> {
               child: Text('Unable to load favorites: ${snapshot.error}'),
             );
           }
-          final products = snapshot.data!
+          final products = snapshot.data ?? []
               .where((product) => _favoriteIds.contains(product.id))
               .toList();
           if (products.isEmpty) {
@@ -81,10 +76,10 @@ class _FavoritesPageState extends State<FavoritesPage> {
               final product = products[index];
               return Card(
                 child: ListTile(
-                  leading: product.image == null || product.image!.isEmpty
+                  leading: product.image == null || (product.image?.isEmpty ?? true)
                       ? const Icon(Icons.shopping_bag_outlined)
                       : Image.network(
-                          product.image!,
+                          product.image ?? '',
                           width: 56,
                           fit: BoxFit.cover,
                         ),

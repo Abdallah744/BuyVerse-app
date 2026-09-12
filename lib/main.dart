@@ -1,13 +1,36 @@
+import 'package:buy_verse_app/core_layer/admin/helpers/app_localization.dart';
+import 'package:buy_verse_app/core_layer/admin/helpers/app_theme.dart';
+import 'package:buy_verse_app/core_layer/admin/helpers/cache_helper.dart';
+import 'package:buy_verse_app/core_layer/admin/helpers/dio_helper.dart';
+import 'package:buy_verse_app/core_layer/admin/helpers/notification_helper.dart';
+import 'package:buy_verse_app/core_layer/user/core/error_boundary.dart';
 import 'package:buy_verse_app/data_layer/admin/repositories/auth_repository.dart';
 import 'package:buy_verse_app/data_layer/admin/repositories/category_repository.dart';
 import 'package:buy_verse_app/data_layer/admin/repositories/order_repository.dart';
 import 'package:buy_verse_app/data_layer/admin/repositories/product_repository.dart';
 import 'package:buy_verse_app/data_layer/admin/repositories/profile_repository.dart';
+import 'package:buy_verse_app/data_layer/user/category_repository_impl.dart';
+import 'package:buy_verse_app/data_layer/user/remote_data/cart_remote_data_source.dart';
+import 'package:buy_verse_app/data_layer/user/remote_data/category_remote_data_source.dart';
+import 'package:buy_verse_app/data_layer/user/remote_data/checkout_remote_data_source.dart';
+import 'package:buy_verse_app/data_layer/user/remote_data/order_remote_data_source.dart';
+import 'package:buy_verse_app/data_layer/user/remote_data/payment_remote_data_source.dart';
+import 'package:buy_verse_app/data_layer/user/services/shared_preferences_service.dart';
+import 'package:buy_verse_app/data_layer/user/user_models/product_remote_data_source.dart';
 import 'package:buy_verse_app/domain_layer/admin/usecases/auth/auth_usecases.dart';
 import 'package:buy_verse_app/domain_layer/admin/usecases/category/category_usecases.dart';
 import 'package:buy_verse_app/domain_layer/admin/usecases/order/order_usecases.dart';
 import 'package:buy_verse_app/domain_layer/admin/usecases/product/product_usecases.dart';
 import 'package:buy_verse_app/domain_layer/admin/usecases/profile/profile_usecases.dart';
+import 'package:buy_verse_app/domain_layer/user/repositories/orders/order_details_repository_impl.dart';
+import 'package:buy_verse_app/domain_layer/user/repositories/orders/order_repository_impl.dart';
+import 'package:buy_verse_app/domain_layer/user/repositories/payment/checkout_repository_impl.dart';
+import 'package:buy_verse_app/domain_layer/user/repositories/payment/payment_process_repository_impl.dart';
+import 'package:buy_verse_app/domain_layer/user/repositories/payment/payment_repository_impl.dart';
+import 'package:buy_verse_app/domain_layer/user/repositories/products/cart_repository_impl.dart';
+import 'package:buy_verse_app/domain_layer/user/repositories/products/product_details_repository_impl.dart';
+import 'package:buy_verse_app/domain_layer/user/repositories/products/product_repository_impl.dart';
+import 'package:buy_verse_app/domain_layer/user/repositories/user_repo_impelement.dart';
 import 'package:buy_verse_app/firebase_options.dart';
 import 'package:buy_verse_app/presentation_layer/admin_version/pages/admin_HomeScreen.dart';
 import 'package:buy_verse_app/presentation_layer/admin_version/state_management/auth/login/login_bloc.dart';
@@ -22,6 +45,16 @@ import 'package:buy_verse_app/presentation_layer/admin_version/state_management/
 import 'package:buy_verse_app/presentation_layer/admin_version/state_management/theme/theme_event.dart';
 import 'package:buy_verse_app/presentation_layer/admin_version/state_management/theme/theme_state.dart';
 import 'package:buy_verse_app/presentation_layer/splash_screen.dart';
+import 'package:buy_verse_app/presentation_layer/user_version/state_management/auth/auth_cubit.dart';
+import 'package:buy_verse_app/presentation_layer/user_version/state_management/category_cubit.dart';
+import 'package:buy_verse_app/presentation_layer/user_version/state_management/orders/order_cubit.dart';
+import 'package:buy_verse_app/presentation_layer/user_version/state_management/orders/order_details_cubit.dart';
+import 'package:buy_verse_app/presentation_layer/user_version/state_management/payment/checkout_cubit.dart';
+import 'package:buy_verse_app/presentation_layer/user_version/state_management/payment/payment_cubit.dart';
+import 'package:buy_verse_app/presentation_layer/user_version/state_management/payment/payment_process_cubit.dart';
+import 'package:buy_verse_app/presentation_layer/user_version/state_management/proudcts/cart_cubit.dart';
+import 'package:buy_verse_app/presentation_layer/user_version/state_management/proudcts/product_cubit.dart';
+import 'package:buy_verse_app/presentation_layer/user_version/state_management/proudcts/product_details_cubit.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -29,18 +62,13 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
-import 'package:buy_verse_app/core_layer/admin/helpers/app_localization.dart';
-import 'package:buy_verse_app/core_layer/admin/helpers/app_theme.dart';
-import 'package:buy_verse_app/core_layer/admin/helpers/cache_helper.dart';
-import 'package:buy_verse_app/core_layer/admin/helpers/dio_helper.dart';
-import 'package:buy_verse_app/core_layer/admin/helpers/notification_helper.dart';
-
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: ".env");
   await Hive.initFlutter();
   await CacheHelper.init();
   await DioHelper.init();
+  await SharedPreferencesService.init();
 
   // إبقاء فايربيز فقط لخدمة الإشعارات المنبثقة (FCM)
   try {
@@ -49,7 +77,7 @@ Future<void> main() async {
     );
     await NotificationHelper.init();
   } catch (e) {
-    print('Notification Service bypass: $e');
+    debugPrint('Notification Service bypass: $e');
   }
 
   String? uId = CacheHelper.getData(key: 'uId');
@@ -64,11 +92,14 @@ Future<void> main() async {
   runApp(
     MultiRepositoryProvider(
       providers: [
+        // Admin Repositories
         RepositoryProvider(create: (context) => AuthRepository()),
         RepositoryProvider(create: (context) => ProductRepository()),
         RepositoryProvider(create: (context) => CategoryRepository()),
         RepositoryProvider(create: (context) => ProfileRepository()),
         RepositoryProvider(create: (context) => OrderRepository()),
+        // User Repositories (only those needed by cubits)
+        RepositoryProvider(create: (context) => UserRepoImpelement()),
       ],
       child: MyApp(startWidget: startWidget),
     ),
@@ -84,6 +115,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
+        // Admin Blocs
         BlocProvider(create: (context) => LayoutBloc()),
         BlocProvider(
           create: (context) => LocalizationBloc()..add(LoadLanguage()),
@@ -147,33 +179,82 @@ class MyApp extends StatelessWidget {
             ),
           )..add(GetProfile()),
         ),
+        // User Cubits
+        BlocProvider(
+          create: (context) =>
+              AuthCubit(repository: context.read<UserRepoImpelement>()),
+        ),
+        BlocProvider(
+          create: (context) =>
+              CategoryCubit(CategoryRepositoryImpl(CategoryRemoteDataSource())),
+        ),
+        BlocProvider(
+          create: (context) =>
+              ProductCubit(ProductRepositoryImpl(ProductRemoteDataSource())),
+        ),
+        BlocProvider(
+          create: (context) => ProductDetailsCubit(
+            ProductRepositoryImpl(ProductRemoteDataSource())
+                as ProductDetailsRepositoryImpl,
+          ),
+        ),
+        BlocProvider(
+          create: (context) =>
+              CartCubit(CartRepositoryImpl(CartRemoteDataSource())),
+        ),
+        BlocProvider(
+          create: (context) =>
+              OrderCubit(OrderRepositoryImpl(OrderRemoteDataSource())),
+        ),
+        BlocProvider(
+          create: (context) => OrderDetailsCubit(
+            OrderRepositoryImpl(OrderRemoteDataSource())
+                as OrderDetailsRepositoryImpl,
+          ),
+        ),
+        BlocProvider(
+          create: (context) =>
+              PaymentCubit(PaymentRepositoryImpl(PaymentRemoteDataSource())),
+        ),
+        BlocProvider(
+          create: (context) => PaymentProcessCubit(
+            PaymentRepositoryImpl(PaymentRemoteDataSource())
+                as PaymentProcessRepositoryImpl,
+          ),
+        ),
+        BlocProvider(
+          create: (context) =>
+              CheckoutCubit(CheckoutRepositoryImpl(CheckoutRemoteDataSource())),
+        ),
       ],
       child: BlocBuilder<LocalizationBloc, LocalizationState>(
         builder: (context, localizationState) {
           return BlocBuilder<ThemeBloc, ThemeState>(
             builder: (context, themeState) {
-              return MaterialApp(
-                debugShowCheckedModeBanner: false,
-                theme: AppTheme.lightTheme,
-                darkTheme: AppTheme.darkTheme,
-                themeMode: themeState.themeMode,
-                home: startWidget,
-                locale: localizationState.locale,
-                supportedLocales: const [Locale('en'), Locale('ar')],
-                localizationsDelegates: const [
-                  AppLocalizations.delegate,
-                  GlobalMaterialLocalizations.delegate,
-                  GlobalWidgetsLocalizations.delegate,
-                  GlobalCupertinoLocalizations.delegate,
-                ],
-                localeResolutionCallback: (locale, supportedLocales) {
-                  for (var supportedLocale in supportedLocales) {
-                    if (supportedLocale.languageCode == locale?.languageCode) {
-                      return supportedLocale;
+              return ErrorBoundary(
+                child: MaterialApp(
+                  debugShowCheckedModeBanner: false,
+                  theme: AppTheme.lightTheme,
+                  darkTheme: AppTheme.darkTheme,
+                  themeMode: themeState.themeMode,
+                  home: startWidget,
+                  locale: localizationState.locale,
+                  supportedLocales: const [Locale('en'), Locale('ar')],
+                  localizationsDelegates: const [
+                    AppLocalizations.delegate,
+                    GlobalMaterialLocalizations.delegate,
+                    GlobalWidgetsLocalizations.delegate,
+                    GlobalCupertinoLocalizations.delegate,
+                  ],
+                  localeResolutionCallback: (locale, supportedLocales) {
+                    for (var supportedLocale in supportedLocales) {
+                      if (supportedLocale.languageCode == locale?.languageCode) {
+                        return supportedLocale;
+                      }
                     }
-                  }
-                  return supportedLocales.first;
-                },
+                    return supportedLocales.first;
+                  },
+                ),
               );
             },
           );

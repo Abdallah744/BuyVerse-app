@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:buy_verse_app/presentation_layer/user_version/pages/home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../core_layer/user/core/params/otp_resend_params.dart';
 import '../../../core_layer/user/core/params/otp_verify_params.dart';
@@ -81,17 +80,6 @@ class _OtpVerifyPageState extends State<OtpVerifyPage> {
               child: BlocConsumer<AuthCubit, AuthState>(
                 listener: (context, state) async {
                   if (state is AuthSuccess) {
-                    final token = state.user.token ?? '';
-                    if (token.isNotEmpty) {
-                      final prefs = await SharedPreferences.getInstance();
-                      await prefs.setString('auth_token', token);
-                    }
-                    final name = state.user.name?.trim();
-                    if (name != null && name.isNotEmpty) {
-                      final prefs = await SharedPreferences.getInstance();
-                      await prefs.setString('auth_name', name);
-                    }
-
                     if (!context.mounted) return;
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
@@ -99,7 +87,8 @@ class _OtpVerifyPageState extends State<OtpVerifyPage> {
                       ),
                     );
 
-                    if (token.isNotEmpty) {
+                    final token = state.user.token;
+                    if (token != null && token.isNotEmpty) {
                       Navigator.of(context).pushAndRemoveUntil(
                         MaterialPageRoute(
                           builder: (_) => HomePage(authToken: token),
@@ -219,7 +208,8 @@ class _OtpVerifyPageState extends State<OtpVerifyPage> {
                                 onPressed: isLoading
                                     ? null
                                     : () {
-                                        if (_formKey.currentState!.validate()) {
+                                        final currentState = _formKey.currentState;
+                                        if (currentState != null && currentState.validate()) {
                                           context.read<AuthCubit>().verifyOtp(
                                             params: OtpVerifyParams(
                                               email: _emailController.text

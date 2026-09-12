@@ -86,15 +86,18 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
         });
 
         if (event.imageFile != null) {
-          formData.files.add(
-            MapEntry(
-              'image',
-              await MultipartFile.fromFile(
-                event.imageFile!.path,
-                filename: 'product.png',
+          final imageFile = event.imageFile;
+          if (imageFile != null) {
+            formData.files.add(
+              MapEntry(
+                'image',
+                await MultipartFile.fromFile(
+                  imageFile.path,
+                  filename: 'product.png',
+                ),
               ),
-            ),
-          );
+            );
+          }
         }
 
         final response = await addProductUseCase(formData);
@@ -130,15 +133,18 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
         });
 
         if (event.imageFile != null) {
-          formData.files.add(
-            MapEntry(
-              'image',
-              await MultipartFile.fromFile(
-                event.imageFile!.path,
-                filename: 'product.png',
+          final imageFile = event.imageFile;
+          if (imageFile != null) {
+            formData.files.add(
+              MapEntry(
+                'image',
+                await MultipartFile.fromFile(
+                  imageFile.path,
+                  filename: 'product.png',
+                ),
               ),
-            ),
-          );
+            );
+          }
         }
 
         final response = await editProductUseCase(

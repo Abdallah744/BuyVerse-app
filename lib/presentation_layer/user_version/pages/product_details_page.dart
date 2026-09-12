@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:buy_verse_app/data_layer/user/services/shared_preferences_service.dart';
 import 'package:buy_verse_app/data_layer/user/user_models/product_details_remote_data_source.dart';
 import 'package:buy_verse_app/domain_layer/user/repositories/products/product_details_repository_impl.dart';
 import 'package:buy_verse_app/data_layer/user/user_models/product_model.dart';
@@ -122,9 +122,9 @@ class _ProductDetailsView extends StatelessWidget {
               children: [
                 ClipRRect(
                   borderRadius: BorderRadius.circular(24),
-                  child: product.image != null && product.image!.isNotEmpty
+                  child: product.image != null && (product.image?.isNotEmpty ?? false)
                       ? Image.network(
-                          product.image!,
+                          product.image ?? '',
                           height: 280,
                           width: double.infinity,
                           fit: BoxFit.cover,
@@ -196,9 +196,9 @@ class _ProductDetailsView extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 24),
-                if (product.slug != null && product.slug!.isNotEmpty)
+                if (product.slug != null && (product.slug?.isNotEmpty ?? false))
                   Text(
-                    'Slug: ${product.slug}',
+                    'Slug: ${product.slug ?? ''}',
                     style: const TextStyle(
                       color: Color(0xFF5E6475),
                       fontSize: 14,
@@ -251,23 +251,23 @@ class _FavoriteButtonState extends State<_FavoriteButton> {
   }
 
   Future<void> _loadFavorite() async {
-    final prefs = await SharedPreferences.getInstance();
-    final ids = prefs.getStringList('favorite_product_ids') ?? [];
+    final ids = await SharedPreferencesService.instance.getFavoriteProductIds();
     if (mounted) {
       setState(() => _isFavorite = ids.contains(widget.productId.toString()));
     }
   }
 
   Future<void> _toggle() async {
-    final prefs = await SharedPreferences.getInstance();
-    final ids = (prefs.getStringList('favorite_product_ids') ?? []).toSet();
+    final ids = (await SharedPreferencesService.instance.getFavoriteProductIds()).toSet();
     if (_isFavorite) {
       ids.remove(widget.productId.toString());
     } else {
       ids.add(widget.productId.toString());
     }
-    await prefs.setStringList('favorite_product_ids', ids.toList());
-    if (mounted) setState(() => _isFavorite = !_isFavorite);
+    await SharedPreferencesService.instance.setFavoriteProductIds(ids.toList());
+    if (mounted) {
+      setState(() => _isFavorite = !_isFavorite);
+    }
   }
 
   @override

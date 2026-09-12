@@ -73,7 +73,7 @@ Widget defaultButton({
       child:
           widget ??
           Text(
-            isUpperCase ? text!.toUpperCase() : text!,
+            isUpperCase ? (text?.toUpperCase() ?? '') : (text ?? ''),
             style: TextStyle(
               color: Colors.white,
               fontSize: context.setSp(16),

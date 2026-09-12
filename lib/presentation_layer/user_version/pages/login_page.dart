@@ -4,9 +4,8 @@ import 'package:buy_verse_app/presentation_layer/user_version/pages/home_page.da
 import 'package:buy_verse_app/presentation_layer/user_version/pages/register_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../admin_version/state_management/auth/login/login_state.dart';
+import '../state_management/auth/auth_cubit.dart';
 import 'otp_verify_page.dart';
 
 class LoginPage extends StatefulWidget {
@@ -39,24 +38,13 @@ class _LoginPageState extends State<LoginPage> {
             child: BlocConsumer<AuthCubit, AuthState>(
               listener: (context, state) async {
                 if (state is AuthSuccess) {
-                  final token = state.user.token ?? '';
-                  if (token.isNotEmpty) {
-                    final prefs = await SharedPreferences.getInstance();
-                    await prefs.setString('auth_token', token);
-                  }
-                  final name = (state.user.name ?? _emailController.text)
-                      .trim();
-                  if (name.isNotEmpty) {
-                    final prefs = await SharedPreferences.getInstance();
-                    await prefs.setString('auth_name', name);
-                  }
-
                   if (!context.mounted) return;
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('Login successful')),
                   );
 
-                  if (token.isNotEmpty) {
+                  final token = state.user.token;
+                  if (token != null && token.isNotEmpty) {
                     Navigator.of(context).pushAndRemoveUntil(
                       MaterialPageRoute(
                         builder: (_) => HomePage(authToken: token),

@@ -103,39 +103,48 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
         });
 
         if (event.profileImagePath != null) {
-          formData.files.add(
-            MapEntry(
-              'picture',
-              await MultipartFile.fromFile(
-                event.profileImagePath!,
-                filename: 'profile.png',
+          final profilePath = event.profileImagePath;
+          if (profilePath != null) {
+            formData.files.add(
+              MapEntry(
+                'picture',
+                await MultipartFile.fromFile(
+                  profilePath,
+                  filename: 'profile.png',
+                ),
               ),
-            ),
-          );
+            );
+          }
         }
 
         if (event.commercialRegisterPath != null) {
-          formData.files.add(
-            MapEntry(
-              'commercial_register',
-              await MultipartFile.fromFile(
-                event.commercialRegisterPath!,
-                filename: 'commercial.pdf',
+          final commRegPath = event.commercialRegisterPath;
+          if (commRegPath != null) {
+            formData.files.add(
+              MapEntry(
+                'commercial_register',
+                await MultipartFile.fromFile(
+                  commRegPath,
+                  filename: 'commercial.pdf',
+                ),
               ),
-            ),
-          );
+            );
+          }
         }
 
         if (event.taxCardPath != null) {
-          formData.files.add(
-            MapEntry(
-              'tax_card',
-              await MultipartFile.fromFile(
-                event.taxCardPath!,
-                filename: 'tax.pdf',
+          final taxCardPath = event.taxCardPath;
+          if (taxCardPath != null) {
+            formData.files.add(
+              MapEntry(
+                'tax_card',
+                await MultipartFile.fromFile(
+                  taxCardPath,
+                  filename: 'tax.pdf',
+                ),
               ),
-            ),
-          );
+            );
+          }
         }
 
         final response = await updateProfileUseCase(formData);
