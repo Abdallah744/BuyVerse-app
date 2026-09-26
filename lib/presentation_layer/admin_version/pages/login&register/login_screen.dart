@@ -17,6 +17,7 @@ import 'package:hexcolor/hexcolor.dart';
 
 import '../../../../core_layer/admin/helpers/app_localization.dart';
 import '../../../../core_layer/admin/helpers/cache_helper.dart';
+import '../../../role_acsess.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -90,7 +91,14 @@ class _LoginScreenState extends State<LoginScreen> {
             elevation: 0,
             leading: IconButton(
               icon: const Icon(Icons.arrow_back, color: Colors.black87),
-              onPressed: () => Navigator.pop(context),
+              onPressed: () {
+                // Navigate back to role selection
+                Navigator.of(context).pushReplacement(
+                  MaterialPageRoute(
+                    builder: (_) => const RoleAccessRestriction(),
+                  ),
+                );
+              },
             ),
           ),
           body: Center(

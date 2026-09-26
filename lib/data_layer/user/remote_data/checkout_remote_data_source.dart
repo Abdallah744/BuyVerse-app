@@ -10,6 +10,14 @@ class CheckoutRemoteDataSource {
   final Dio dioClient;
   final String baseUrl;
 
+  Options _options(String? token) => Options(
+    headers: {
+      if (token != null && token.isNotEmpty)
+        'Authorization': ApiConfig.authorizationHeader(token),
+      'Accept': 'application/json',
+    },
+  );
+
   Future<CheckoutModel> createOrder({
     required List<int> productIds,
     required List<int> quantities,
@@ -20,6 +28,13 @@ class CheckoutRemoteDataSource {
     required String paymentMethod,
     String? token,
   }) async {
+    print('Creating order with data:');
+    print('Product IDs: $productIds');
+    print('Quantities: $quantities');
+    print('Prices: $prices');
+    print('Address: $address');
+    print('Payment method: $paymentMethod');
+    
     final response = await dioClient.post(
       '$baseUrl/client/orders/store',
       data: {
@@ -29,22 +44,23 @@ class CheckoutRemoteDataSource {
         'address': address,
         'latitude': latitude,
         'longitude': longitude,
-        'payment_method': 'stripe',
+        'payment_method': paymentMethod,
+        'update_stock': true, // Request stock update
       },
-      options: Options(
-        headers: {
-          if (token != null && token.isNotEmpty)
-            'Authorization': ApiConfig.authorizationHeader(token),
-          'Accept': 'application/json',
-        },
-      ),
+      options: _options(token),
     );
+    
+    print('Order creation response status: ${response.statusCode}');
+    print('Order creation response data: ${response.data}');
+    
     if (response.statusCode == null ||
         response.statusCode! < 200 ||
         response.statusCode! >= 300) {
       throw DioException(
         requestOptions: response.requestOptions,
-        error: 'Failed to create order',
+        error: response.data is Map<String, dynamic>
+            ? (response.data['message'] ?? 'Failed to create order')
+            : 'Failed to create order',
       );
     }
     dynamic payload = response.data;
@@ -58,6 +74,11 @@ class CheckoutRemoteDataSource {
         error: 'Unexpected order response format',
       );
     }
-    return CheckoutModel.fromJson(payload);
+    final checkout = CheckoutModel.fromJson(payload);
+    
+    // Log for debugging
+    print('Created order with ID: ${checkout.id}');
+    
+    return checkout;
   }
 }

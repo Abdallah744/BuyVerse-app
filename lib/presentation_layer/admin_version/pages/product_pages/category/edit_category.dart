@@ -122,6 +122,9 @@ class _EditCategoryPageState extends State<EditCategoryPage> {
                                 id: widget.category.id,
                                 name: nameController.text,
                                 description: descController.text,
+                                slug: widget.category.slug.isNotEmpty
+                                    ? widget.category.slug
+                                    : widget.category.id,
                               ),
                             ),
                           );

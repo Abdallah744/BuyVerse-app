@@ -294,6 +294,9 @@ class _EditProductPageState extends State<EditProductPage> {
                                 description: descriptionController.text,
                                 image: widget.product.image,
                                 isVisible: isVisible,
+                                slug: widget.product.slug.isNotEmpty
+                                    ? widget.product.slug
+                                    : widget.product.id,
                               ),
                               imageFile: newImage,
                             ),

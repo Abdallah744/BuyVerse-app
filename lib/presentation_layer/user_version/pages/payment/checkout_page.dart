@@ -57,7 +57,7 @@ class _CheckoutViewState extends State<_CheckoutView> {
   final TextEditingController latitudeController = TextEditingController();
   final TextEditingController longitudeController = TextEditingController();
   final TextEditingController paymentController = TextEditingController(
-    text: 'stripe',
+    text: 'cash',
   );
 
   @override
@@ -90,18 +90,32 @@ class _CheckoutViewState extends State<_CheckoutView> {
       body: BlocConsumer<CheckoutCubit, CheckoutState>(
         listener: (context, state) {
           if (state is CheckoutSuccess) {
-            Navigator.of(context).pushReplacement(
-              MaterialPageRoute(
-                builder: (_) => PaymentPage(
-                  orderId: state.checkout.id,
-                  authToken: widget.authToken,
-                  defaultPaymentData: {
-                    'payment_method': 'stripe',
-                    'amount': state.checkout.total,
-                  },
+            final orderIdentifier = state.checkout.code.isNotEmpty
+                ? state.checkout.code
+                : state.checkout.id;
+            if (orderIdentifier.toString().isNotEmpty &&
+                orderIdentifier != 0 &&
+                orderIdentifier != '0') {
+              Navigator.of(context).pushReplacement(
+                MaterialPageRoute(
+                  builder: (_) => PaymentPage(
+                    orderId: orderIdentifier,
+                    authToken: widget.authToken,
+                    defaultPaymentData: {
+                      'payment_method': 'cod',
+                      'amount': state.checkout.total,
+                    },
+                  ),
                 ),
-              ),
-            );
+              );
+            } else {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Order created but invalid ID received'),
+                  backgroundColor: Colors.orange,
+                ),
+              );
+            }
           }
           if (state is CheckoutError) {
             ScaffoldMessenger.of(context).showSnackBar(
@@ -171,8 +185,8 @@ class _CheckoutViewState extends State<_CheckoutView> {
                   controller: paymentController,
                   readOnly: true,
                   decoration: const InputDecoration(
-                    labelText: 'Payment method (Stripe)',
-                    prefixIcon: Icon(Icons.credit_card),
+                    labelText: 'Payment method (Cash)',
+                    prefixIcon: Icon(Icons.money),
                     border: OutlineInputBorder(),
                   ),
                 ),
@@ -253,13 +267,11 @@ class _CheckoutViewState extends State<_CheckoutView> {
                             context.read<CheckoutCubit>().createOrder(
                               productIds: widget.productIds,
                               quantities: widget.quantities,
-                              prices: widget.prices
-                                  .map((e) => e.toInt())
-                                  .toList(),
+                              prices: widget.prices,
                               address: address,
                               latitude: latitude,
                               longitude: longitude,
-                              paymentMethod: 'stripe',
+                              paymentMethod: 'cash',
                               token: widget.authToken,
                             );
                           },

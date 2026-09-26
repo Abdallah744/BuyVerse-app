@@ -10,7 +10,7 @@ class OrderDetailsRepositoryImpl implements OrderDetailsRepository {
 
   @override
   Future<OrderModel> getOrderDetails({
-    required int orderId,
+    required dynamic orderId,
     String? token,
   }) async {
     return remoteDataSource.getOrderDetails(orderId: orderId, token: token);

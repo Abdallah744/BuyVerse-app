@@ -2,6 +2,7 @@ class OrderModel {
   const OrderModel({
     required this.id,
     required this.orderNumber,
+    this.code = '',
     required this.status,
     required this.totalAmount,
     required this.createdAt,
@@ -13,6 +14,7 @@ class OrderModel {
 
   final int id;
   final String orderNumber;
+  final String code;
   final String status;
   final String totalAmount;
   final String createdAt;
@@ -27,6 +29,12 @@ class OrderModel {
         : json;
 
     final orderId = data['id'] ?? data['order_id'] ?? 0;
+    final rawCode = (data['code'] ??
+            data['order_number'] ??
+            data['number'] ??
+            data['orderNo'] ??
+            orderId)
+        .toString();
     final number = (data['order_number'] ??
             data['number'] ??
             data['orderNo'] ??
@@ -63,6 +71,7 @@ class OrderModel {
     return OrderModel(
       id: int.tryParse(orderId.toString()) ?? 0,
       orderNumber: number,
+      code: rawCode.replaceAll('#', '').trim(),
       status: status,
       totalAmount: amount,
       createdAt: createdAt,
@@ -111,6 +120,7 @@ class OrderModel {
       OrderModel(
         id: 1,
         orderNumber: '#1024',
+        code: '1024',
         status: 'Shipped',
         totalAmount: '\$249.00',
         createdAt: '2026-09-01',
@@ -123,6 +133,7 @@ class OrderModel {
       OrderModel(
         id: 2,
         orderNumber: '#1028',
+        code: '1028',
         status: 'Processing',
         totalAmount: '\$159.00',
         createdAt: '2026-09-04',

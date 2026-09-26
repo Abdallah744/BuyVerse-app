@@ -98,8 +98,8 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
           'national_id': event.profile.nationalId,
           'business_name': event.profile.businessName,
           'address': event.profile.businessAddress,
-          if (lat != null) 'latitude': lat,
-          if (lng != null) 'longitude': lng,
+          'latitude': ?lat,
+          'longitude': ?lng,
         });
 
         if (event.profileImagePath != null) {

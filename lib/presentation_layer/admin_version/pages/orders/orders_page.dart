@@ -99,7 +99,7 @@ class OrdersPage extends StatelessWidget {
 
     return InkWell(
       onTap: () {
-        navigateTo(context, const OrderDetailsPage());
+        navigateTo(context, OrderDetailsPage(order: order));
       },
       child: Container(
         padding: EdgeInsets.all(context.setWidth(15)),

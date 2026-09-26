@@ -56,9 +56,9 @@ class ProfileRemoteDataSource {
     File? picture,
   }) async {
     final formData = FormData.fromMap({
-      if (name != null) 'name': name,
-      if (email != null) 'email': email,
-      if (phone != null) 'phone': phone,
+      'name': ?name,
+      'email': ?email,
+      'phone': ?phone,
       if (picture != null)
         'picture': await MultipartFile.fromFile(picture.path),
     });

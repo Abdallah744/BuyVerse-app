@@ -330,7 +330,7 @@ class _HomeContent extends StatelessWidget {
                                               : Colors.green,
                                           onTap: () => navigateTo(
                                             context,
-                                            const OrderDetailsPage(),
+                                            OrderDetailsPage(order: recentOrdersList[index]),
                                           ),
                                         ),
                                     separatorBuilder: (context, index) =>

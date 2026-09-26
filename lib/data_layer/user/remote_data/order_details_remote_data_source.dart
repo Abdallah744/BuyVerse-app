@@ -15,25 +15,34 @@ class OrderDetailsRemoteDataSource {
   final String? authToken;
 
   Future<OrderModel> getOrderDetails({
-    required int orderId,
+    required dynamic orderId,
     String? token,
   }) async {
     final bearerToken = token ?? authToken;
+    print('Fetching order details for ID/Code: $orderId');
+
     final response = await dioClient.get(
       '$baseUrl/client/orders/show/$orderId',
       options: Options(
         headers: {
           if (bearerToken != null && bearerToken.isNotEmpty)
             'Authorization': ApiConfig.authorizationHeader(bearerToken),
+          'Accept': 'application/json',
         },
       ),
     );
+
+    print('Order details response status: ${response.statusCode}');
+    print('Order details response data: ${response.data}');
+
     if (response.statusCode == null ||
         response.statusCode! < 200 ||
         response.statusCode! >= 300) {
       throw DioException(
         requestOptions: response.requestOptions,
-        error: 'Failed to load order details',
+        error: response.data is Map<String, dynamic>
+            ? (response.data['message'] ?? 'Failed to load order details')
+            : 'Failed to load order details',
       );
     }
     final payload = response.data;

@@ -11,13 +11,16 @@ class PaymentRemoteDataSource {
   final String baseUrl;
 
   Future<PaymentModel> payOrder({
-    required int orderId,
+    required dynamic orderId,
     required Map<String, dynamic> paymentData,
     String? token,
   }) async {
+    print('Attempting to pay for order ID/Code: $orderId');
+    print('Payment data: $paymentData');
+
     final response = await dioClient.post(
       '$baseUrl/client/orders/pay/$orderId',
-      data: {...paymentData, 'payment_method': 'stripe'},
+      data: paymentData,
       options: Options(
         headers: {
           if (token != null && token.isNotEmpty)
@@ -26,12 +29,18 @@ class PaymentRemoteDataSource {
         },
       ),
     );
+
+    print('Payment response status: ${response.statusCode}');
+    print('Payment response data: ${response.data}');
+
     if (response.statusCode == null ||
         response.statusCode! < 200 ||
         response.statusCode! >= 300) {
       throw DioException(
         requestOptions: response.requestOptions,
-        error: 'Payment failed',
+        error: response.data is Map<String, dynamic>
+            ? (response.data['message'] ?? 'Payment failed')
+            : 'Payment failed',
       );
     }
     dynamic payload = response.data;

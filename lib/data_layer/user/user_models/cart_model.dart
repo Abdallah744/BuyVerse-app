@@ -18,36 +18,56 @@ class CartModel {
   final double total;
 
   factory CartModel.fromJson(Map<String, dynamic> json) {
+    final product = json['product'] is Map
+        ? Map<String, dynamic>.from(json['product'] as Map)
+        : const <String, dynamic>{};
     final rawId = json['id'] ?? json['cart_id'] ?? json['cartId'] ?? 0;
     final rawProductId =
-        json['product_id'] ?? json['productId'] ?? json['product'] ?? 0;
-    final productName = json['product_name'] ??
+        json['product_id'] ??
+        json['productId'] ??
+        product['id'] ??
+        product['product_id'] ??
+        0;
+    final productName =
+        json['product_name'] ??
         json['productName'] ??
         json['name'] ??
         json['title'] ??
+        product['name'] ??
+        product['title'] ??
+        product['product_name'] ??
         'Product';
     final rawQuantity = json['quantity'] ?? json['qty'] ?? 1;
-    final rawPrice = json['price'] ??
+    final rawPrice =
+        json['price'] ??
         json['amount'] ??
         json['product_price'] ??
         json['unit_price'] ??
+        product['price'] ??
+        product['amount'] ??
         0;
-    final rawTotal =
-        json['total'] ?? json['line_total'] ?? json['subtotal'] ?? 0;
+    final rawTotal = json['total'] ?? json['line_total'] ?? json['subtotal'];
 
     final productIdValue = int.tryParse(rawProductId.toString()) ?? 0;
+    final quantityValue = int.tryParse(rawQuantity.toString()) ?? 1;
     final priceValue = double.tryParse(rawPrice.toString()) ?? 0;
-    final totalValue = double.tryParse(rawTotal.toString()) ??
-        (priceValue * (int.tryParse(rawQuantity.toString()) ?? 1));
+    final totalValue =
+        double.tryParse(rawTotal?.toString() ?? '') ??
+        (priceValue * quantityValue);
 
     return CartModel(
       id: int.tryParse(rawId.toString()) ?? 0,
       productId: productIdValue,
       productName: productName.toString(),
       productImage:
-          (json['image'] ?? json['image_url'] ?? json['product_image'])
+          (json['image'] ??
+                  json['image_url'] ??
+                  json['product_image'] ??
+                  product['image'] ??
+                  product['image_url'] ??
+                  product['product_image'])
               ?.toString(),
-      quantity: int.tryParse(rawQuantity.toString()) ?? 1,
+      quantity: quantityValue,
       price: priceValue,
       total: totalValue,
     );

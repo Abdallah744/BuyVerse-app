@@ -14,7 +14,7 @@ class PaymentPage extends StatelessWidget {
     this.defaultPaymentData = const {},
   });
 
-  final int orderId;
+  final dynamic orderId;
   final String? authToken;
   final Map<String, dynamic> defaultPaymentData;
 
@@ -39,7 +39,7 @@ class _PaymentView extends StatefulWidget {
     this.defaultPaymentData = const {},
   });
 
-  final int orderId;
+  final dynamic orderId;
   final String? authToken;
   final Map<String, dynamic> defaultPaymentData;
 
@@ -49,7 +49,7 @@ class _PaymentView extends StatefulWidget {
 
 class _PaymentViewState extends State<_PaymentView> {
   final TextEditingController methodController = TextEditingController(
-    text: 'stripe',
+    text: 'COD',
   );
   final TextEditingController detailsController = TextEditingController(
     text: '',
@@ -120,8 +120,8 @@ class _PaymentViewState extends State<_PaymentView> {
                   readOnly: true,
                   decoration: const InputDecoration(
                     labelText: 'Payment method',
-                    hintText: 'Stripe',
-                    prefixIcon: Icon(Icons.credit_card),
+                    hintText: 'Cash',
+                    prefixIcon: Icon(Icons.money),
                     border: OutlineInputBorder(),
                   ),
                 ),
@@ -143,7 +143,7 @@ class _PaymentViewState extends State<_PaymentView> {
                         : () {
                             final data = {
                               ...widget.defaultPaymentData,
-                              'payment_method': 'stripe',
+                              'payment_method': 'cod',
                               'details': detailsController.text.trim(),
                             };
 

@@ -15,12 +15,13 @@ class OrderDetailsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final orderIdentifier = order.code.isNotEmpty ? order.code : order.id;
     return BlocProvider(
       create: (_) => OrderDetailsCubit(
         OrderDetailsRepositoryImpl(
           OrderDetailsRemoteDataSource(authToken: authToken),
         ),
-      )..fetchOrderDetails(orderId: order.id, token: authToken),
+      )..fetchOrderDetails(orderId: orderIdentifier, token: authToken),
       child: _OrderDetailsView(order: order, authToken: authToken),
     );
   }
@@ -173,10 +174,12 @@ class _OrderDetailsView extends StatelessWidget {
                               context,
                               MaterialPageRoute(
                                 builder: (_) => PaymentPage(
-                                  orderId: details.id,
+                                  orderId: details.code.isNotEmpty
+                                      ? details.code
+                                      : details.id,
                                   authToken: authToken,
                                   defaultPaymentData: const {
-                                    'payment_method': 'stripe',
+                                    'payment_method': 'cod',
                                   },
                                 ),
                               ),

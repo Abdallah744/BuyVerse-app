@@ -9,6 +9,7 @@ class Product extends Equatable {
   final String description;
   final String image;
   final bool isVisible;
+  final String slug;
 
   const Product({
     required this.id,
@@ -19,6 +20,7 @@ class Product extends Equatable {
     required this.description,
     required this.image,
     this.isVisible = true,
+    this.slug = '',
   });
 
   @override
@@ -31,5 +33,6 @@ class Product extends Equatable {
     description,
     image,
     isVisible,
+    slug,
   ];
 }

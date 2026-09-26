@@ -93,9 +93,12 @@ class CategoryBloc extends Bloc<CategoryEvent, CategoryState> {
 
     on<EditCategory>((event, emit) async {
       try {
+        final categoryIdentifier = event.category.slug.isNotEmpty
+            ? event.category.slug
+            : event.category.id;
         final response = await editCategoryUseCase(
           EditCategoryParams(
-            id: event.category.id,
+            id: categoryIdentifier,
             name: event.category.name,
             description: event.category.description,
           ),
@@ -111,7 +114,7 @@ class CategoryBloc extends Bloc<CategoryEvent, CategoryState> {
             CategoryError(
               e.response?.data['message']?.toString() ??
                   e.message ??
-                  'Error adding category',
+                  'Error updating category',
             ),
           );
         }

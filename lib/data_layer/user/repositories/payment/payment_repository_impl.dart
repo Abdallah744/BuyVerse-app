@@ -9,7 +9,7 @@ class PaymentRepositoryImpl implements PaymentRepository {
 
   @override
   Future<PaymentModel> payOrder({
-    required int orderId,
+    required dynamic orderId,
     required Map<String, dynamic> paymentData,
     String? token,
   }) async {

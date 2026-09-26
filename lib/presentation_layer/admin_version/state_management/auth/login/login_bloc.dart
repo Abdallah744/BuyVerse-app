@@ -205,6 +205,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       } finally {
         await CacheHelper.removeData(key: 'token');
         await CacheHelper.removeData(key: 'uId');
+        await CacheHelper.removeData(key: 'role'); // Clear role
         DioHelper.token = null; // Clear static token
         emit(Unauthenticated());
       }

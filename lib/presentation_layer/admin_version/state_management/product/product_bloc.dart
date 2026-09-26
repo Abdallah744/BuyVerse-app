@@ -42,12 +42,27 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
         if (response.statusCode == 200) {
           final List<dynamic> data = response.data['data'];
           final products = data.map((json) {
+            final rawSlug = json['slug']?.toString() ?? '';
+            final rawId = json['id']?.toString() ?? '';
+            final productIdentifier = rawSlug.isNotEmpty ? rawSlug : rawId;
+
+            String categoryName = '';
+            if (json['category'] is Map) {
+              categoryName =
+                  json['category']['id']?.toString() ??
+                  json['category']['name']?.toString() ??
+                  '';
+            } else if (json['category'] != null) {
+              categoryName = json['category'].toString();
+            }
+
             final product = Product(
-              id: json['id']?.toString() ?? json['slug'] ?? '',
+              id: productIdentifier,
+              slug: rawSlug.isNotEmpty ? rawSlug : rawId,
               name: json['name'] ?? '',
-              category: json['category']['name'] ?? '',
-              price: json['price'].toString(),
-              quantity: json['quantity'].toString(),
+              category: categoryName,
+              price: json['price']?.toString() ?? '0',
+              quantity: json['quantity']?.toString() ?? '0',
               description: json['description'] ?? '',
               image:
                   json['image_url'] ??
@@ -55,7 +70,7 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
                   json['picture_url'] ??
                   json['picture'] ??
                   '',
-              isVisible: json['visible'] == 1,
+              isVisible: json['visible'] == 1 || json['visible'] == true,
             );
 
             // فحص المخزون وإرسال إشعار محلي
