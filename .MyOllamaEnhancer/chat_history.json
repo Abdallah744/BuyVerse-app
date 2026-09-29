@@ -1,0 +1,26 @@
+[
+  {
+    "sender": "You",
+    "message": "هل يوجد اخطاء"
+  },
+  {
+    "sender": "AI",
+    "message": ""
+  },
+  {
+    "sender": "System",
+    "message": "Error: model 'llama3:8b-instruct-q6_K' not found"
+  },
+  {
+    "sender": "You",
+    "message": "اربط سكشن ال user بملف main.dart زي سكشن ال admin  وايضا اربطه بال role acsess زي الادمن ويحفظ تسجيل الدخول لل user"
+  },
+  {
+    "sender": "AI",
+    "message": ""
+  },
+  {
+    "sender": "System",
+    "message": "Error: model 'llama3:8b-instruct-q6_K' not found"
+  }
+]

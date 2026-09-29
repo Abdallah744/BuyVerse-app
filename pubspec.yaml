@@ -65,6 +65,10 @@ dev_dependencies:
   hive_generator: ^2.0.1
   build_runner: ^2.4.9
 
+dependency_overrides:
+  analyzer: ^6.0.0
+
+
 flutter_launcher_icons:
   android: "launcher_icon"
   ios: true

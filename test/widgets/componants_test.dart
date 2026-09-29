@@ -1,4 +1,4 @@
-import 'package:buy_verse_app/presentation_layer/admin_version/widgets/componants.dart';
+import 'package:buy_verse_app/admin_version/presentation_layer/widgets/componants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
